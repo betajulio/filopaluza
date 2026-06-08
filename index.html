@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0D0805">
+<meta name="description" content="Filópaluza — O barzinho dos amigos. Sugestões, enquetes e repertório sertanejo.">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="imagens/filopaluza_logo.png">
+<title>Filópaluza — Sertanejo & Barzinho</title>
+<link rel="stylesheet" href="style.css">
+<style>
+/* Page-specific extras */
+#hero { padding-top: 60px }
+
+/* QUICK ACCESS */
+#acesso-rapido { background: linear-gradient(180deg, transparent, rgba(200,112,26,.04), transparent); }
+
+/* MEMBER ADMIN PORTAL BADGE */
+.toca-badge {
+  position:relative; display:grid; grid-template-columns:auto 1fr;
+  align-items:center; gap:1.6rem;
+  background: linear-gradient(135deg,rgba(42,21,8,.94),rgba(22,13,7,.9)),
+              radial-gradient(circle at top left,rgba(200,112,26,.16),transparent 42%);
+  border:1px solid rgba(200,112,26,.28); border-radius:4px;
+  padding:1.4rem 1.6rem; margin:0 0 1.8rem; cursor:pointer; overflow:hidden;
+  box-shadow:0 18px 40px rgba(0,0,0,.28); transition:transform .25s,border-color .25s,box-shadow .25s;
+}
+.toca-badge:hover{ transform:translateY(-2px); border-color:rgba(200,112,26,.5); box-shadow:0 24px 50px rgba(0,0,0,.32) }
+.toca-badge-img{ width:64px; height:64px; border-radius:50%; object-fit:cover; border:2px solid rgba(200,112,26,.35); flex-shrink:0 }
+.toca-badge-name{ font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:700; color:var(--cream) }
+.toca-badge-sub{ font-size:.76rem; color:var(--smoke); margin-top:.2rem; font-style:italic }
+.toca-chip{ display:inline-flex; align-items:center; gap:.35rem; margin-top:.55rem; padding:.25rem .65rem; border:1px solid rgba(200,112,26,.3); border-radius:999px; background:rgba(200,112,26,.1); font-size:.65rem; letter-spacing:.1em; text-transform:uppercase; color:var(--amber); font-family:'Playfair Display',serif }
+
+@media(max-width:768px){
+  .toca-badge{ grid-template-columns:1fr; text-align:center; gap:.8rem }
+  .toca-badge-img{ margin:0 auto }
+}
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-title">Filópaluza</div>
+  <div class="loading-bar"><div class="loading-fill"></div></div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">Filópaluza</a>
+  <ul class="nav-links">
+    <li><a href="index.html" style="color:var(--gold)">Home</a></li>
+    <li><a href="sugestoes.html">Sugestões</a></li>
+    <li style="position:relative"><a href="enquetes.html">Enquetes <span id="promoCountdownNav" class="badge-new" style="display:none"></span></a></li>
+    <li><a href="repertorio.html">Repertório</a></li>
+    <li class="member-admin-only"><a href="logs.html" style="color:var(--amber)">⚡ Admin</a></li>
+  </ul>
+  <div class="nav-auth">
+    <span class="nav-user" id="navUser" style="display:none">🤠 Membro</span>
+    <button class="btn-ghost btn-sm" id="loginBtn" onclick="openLogin()">Entrar</button>
+    <button class="btn-ghost btn-sm" id="logoutBtn" onclick="doLogout()" style="display:none">Sair</button>
+  </div>
+  <button class="nav-hamburger" id="navHamburger" onclick="toggleMobileMenu()">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="nav-mobile-menu" id="navMobileMenu">
+  <a href="index.html" style="color:var(--gold)">Home</a>
+  <a href="sugestoes.html">Sugestões</a>
+  <a href="enquetes.html">Enquetes <span class="badge-mobile-inline" id="promoCountdownNavMobile" style="display:none"></span></a>
+  <a href="repertorio.html">Repertório</a>
+  <a href="logs.html" id="adminLinkMobile" class="member-admin-only" style="color:var(--amber)">⚡ Portal Admin</a>
+  <div style="border-top:1px solid rgba(200,112,26,.1);margin-top:.5rem;padding:1rem 2rem;display:flex;flex-direction:column;gap:.8rem">
+    <span class="nav-user" id="navUserMobile" style="display:none;text-align:center">🤠 Membro</span>
+    <button class="btn-ghost" id="loginBtnMobile" onclick="openLoginMobile()">Entrar</button>
+    <button class="btn-ghost" id="logoutBtnMobile" onclick="doLogout()" style="display:none">Sair</button>
+  </div>
+</div>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-lines"></div>
+  <div class="hero-content">
+    <div class="hero-logo-wrap">
+      <img src="imagens/filopaluza_logo.png" alt="Filópaluza" class="hero-logo-img">
+    </div>
+    <div class="hero-tag">Sertanejo · Barzinho · Amizade</div>
+    <h1 class="hero-title">Filópaluza</h1>
+    <div class="hero-divider"><div class="hero-diamond"></div></div>
+    <p class="hero-subtitle">O barzinho dos amigos</p>
+  </div>
+  <div class="scroll-hint">
+    <span>Descer</span>
+    <div class="scroll-arrow"></div>
+  </div>
+</section>
+
+<hr class="full-divider">
+
+<!-- MEMBROS -->
+<section id="membros">
+  <div class="section-header">
+    <div class="section-number">01</div>
+    <div class="section-title-wrap">
+      <h2>Membros</h2>
+      <p>A galera do Filópaluza</p>
+    </div>
+    <div class="section-line"></div>
+    <button class="btn-ghost btn-sm member-admin-only" onclick="openAddMember()">+ Membro</button>
+  </div>
+
+  <!-- Portal Admin Badge (visible to admin only) -->
+  <div class="member-admin-only" id="adminBadgeWrap" style="display:none"></div>
+
+  <div class="members-grid" id="membrosGrid">
+    <p style="color:var(--smoke);font-style:italic">Carregando...</p>
+  </div>
+</section>
+
+<hr class="full-divider">
+
+<!-- ACESSO RÁPIDO -->
+<section id="acesso-rapido">
+  <div class="section-header">
+    <div class="section-number">02</div>
+    <div class="section-title-wrap">
+      <h2>Portal</h2>
+      <p>Tudo do Filópaluza em um lugar</p>
+    </div>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="quick-access-grid">
+    <a href="sugestoes.html" class="quick-card">
+      <span class="quick-card-icon">🎵</span>
+      <div class="quick-card-title">Sugestões</div>
+      <p class="quick-card-desc">Sugira músicas sertanejas, vote nas favoritas e veja o ranking com 👍 e 👎.</p>
+      <span class="quick-card-arrow">→</span>
+    </a>
+    <a href="enquetes.html" class="quick-card">
+      <span class="quick-card-icon">🗳️</span>
+      <div class="quick-card-title">Enquetes</div>
+      <p class="quick-card-desc">Votações secretas para decidir o repertório. Promoção automática toda sexta.</p>
+      <span class="quick-card-arrow">→</span>
+    </a>
+    <a href="repertorio.html" class="quick-card">
+      <span class="quick-card-icon">📋</span>
+      <div class="quick-card-title">Repertório</div>
+      <p class="quick-card-desc">Músicas que a galera já manda bem. Com links de YouTube e cifras.</p>
+      <span class="quick-card-arrow">→</span>
+    </a>
+  </div>
+</section>
+
+<div style="height:4rem"></div>
+
+<!-- LOGIN MODAL -->
+<div class="modal-overlay" id="loginModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeLogin()">✕</button>
+    <div class="modal-title">Entrar no Filópaluza</div>
+    <div class="modal-subtitle">Acesso exclusivo para os membros da galera</div>
+    <div id="loginStep1">
+      <button class="btn-google" onclick="doGoogleLogin()">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.569 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.707A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.707V4.961H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.039l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.961L3.964 6.293C4.672 4.166 6.656 3.58 9 3.58z"/></svg>
+        Entrar com Google
+      </button>
+    </div>
+    <div class="modal-error" id="loginError">Erro ao autenticar. Tente novamente.</div>
+  </div>
+</div>
+
+<!-- MEMBER EDIT MODAL -->
+<div class="modal-overlay" id="memberModal">
+  <div class="modal modal-wide" style="max-width:600px">
+    <button class="modal-close" onclick="closeMemberModal()">✕</button>
+    <div class="modal-title" id="memberModalTitle">Editar Perfil</div>
+    <div class="modal-subtitle">Atualize suas informações no Filópaluza</div>
+    <div id="memberModalBody"></div>
+  </div>
+</div>
+
+<!-- PHOTO CROP -->
+<div class="photo-crop-overlay" id="photoCropOverlay" style="display:none">
+  <div class="photo-crop-box">
+    <div class="photo-crop-title">🤠 Ajustar Foto</div>
+    <div class="photo-crop-stage" id="photoCropStage">
+      <canvas id="photoCropCanvas"></canvas>
+    </div>
+    <input type="range" class="photo-crop-zoom" id="photoCropZoom" min="1" max="4" step="0.01" value="1">
+    <div class="photo-crop-actions">
+      <button class="btn-ghost btn-sm" onclick="cancelCrop()">Cancelar</button>
+      <button class="btn btn-sm" onclick="confirmCrop()">✓ Usar esta foto</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+window.confirmAction = (msg) => confirm(msg);
+</script>
+
+<script type="module">
+import {
+  db, auth, storage, provider,
+  collection, doc, onSnapshot, addDoc, deleteDoc, updateDoc, setDoc, getDoc, getDocs,
+  orderBy, query, serverTimestamp,
+  signInWithPopup, signOut, onAuthStateChanged,
+  storageRef, uploadBytesResumable, getDownloadURL
+} from "./firebase-init.js";
+
+// ─── STATE ───────────────────────────────────────
+let isLoggedIn = false;
+let isMember   = false;
+let membersCache = [];
+let editingMemberId = null;
+let cropCanvas, cropCtx, cropImg;
+let cropX = 0, cropY = 0, cropZoom = 1;
+let cropDragging = false, cropLastX = 0, cropLastY = 0;
+let cropResolve = null;
+
+const INSTRUMENTS = ['Guitarra','Violão','Baixo','Bateria','Teclado','Sanfona','Voz','Percussão'];
+const PROMOTIONS_BASE_URL = 'https://us-central1-SEU-PROJETO-ID.cloudfunctions.net';
+const promotionStateRef = doc(db, 'promotion_state', 'current');
+
+// ─── TOAST ───────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3200);
+}
+
+// ─── HELPERS ─────────────────────────────────────
+function formatTs(ts) {
+  if (!ts) return '';
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  if (isNaN(d)) return '';
+  return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+}
+
+// ─── AUTH ─────────────────────────────────────────
+async function isEmailApproved(email) {
+  const snap = await getDoc(doc(db, 'approved_emails', email.toLowerCase()));
+  return snap.exists();
+}
+
+window.openLogin  = () => document.getElementById('loginModal').classList.add('show');
+window.closeLogin = () => document.getElementById('loginModal').classList.remove('show');
+window.openLoginMobile = () => { closeMobileMenu(); openLogin(); };
+
+window.doGoogleLogin = async () => {
+  try {
+    await signInWithPopup(auth, provider);
+    closeLogin();
+  } catch(e) {
+    if (e.code !== 'auth/popup-closed-by-user')
+      document.getElementById('loginError').classList.add('show');
+  }
+};
+
+window.doLogout = async () => {
+  await signOut(auth);
+  showToast('Até logo! 🤠');
+};
+
+onAuthStateChanged(auth, async user => {
+  if (user) {
+    const approved = await isEmailApproved(user.email);
+    isMember   = approved;
+    isLoggedIn = true;
+    const firstName = user.displayName?.split(' ')[0] || user.email?.split('@')[0] || 'Visitante';
+    document.getElementById('navUser').textContent       = `🤠 ${firstName}`;
+    document.getElementById('navUserMobile').textContent = `🤠 ${firstName}`;
+  } else {
+    isLoggedIn = false;
+    isMember   = false;
+  }
+  applyAuth();
+  loadMembers();
+  updatePromotionCountdowns();
+});
+
+function applyAuth() {
+  document.body.classList.toggle('logged-in', isLoggedIn);
+  document.body.classList.toggle('is-member', isMember);
+  document.getElementById('loginBtn').style.display        = isLoggedIn ? 'none' : '';
+  document.getElementById('logoutBtn').style.display       = isLoggedIn ? '' : 'none';
+  document.getElementById('navUser').style.display         = isLoggedIn ? '' : 'none';
+  document.getElementById('loginBtnMobile').style.display  = isLoggedIn ? 'none' : '';
+  document.getElementById('logoutBtnMobile').style.display = isLoggedIn ? '' : 'none';
+  document.getElementById('navUserMobile').style.display   = isLoggedIn ? '' : 'none';
+  if (isMember) {
+    const wrap = document.getElementById('adminBadgeWrap');
+    if (wrap) {
+      wrap.style.display = 'block';
+      renderAdminBadge(wrap);
+    }
+  }
+}
+
+// ─── ADMIN BADGE ──────────────────────────────────
+function renderAdminBadge(wrap) {
+  const user = auth.currentUser;
+  if (!user) return;
+  const name  = user.displayName?.split(' ').slice(0,2).join(' ') || user.email?.split('@')[0] || 'Membro';
+  const photo = user.photoURL || '';
+  const initials = (user.displayName || name).split(' ').map(w=>w[0]||'').join('').slice(0,2).toUpperCase();
+  wrap.innerHTML = `
+    <a href="logs.html" class="toca-badge" style="text-decoration:none">
+      ${photo
+        ? `<img src="${photo}" class="toca-badge-img" alt="${name}">`
+        : `<div class="toca-badge-img" style="background:linear-gradient(135deg,var(--brown),var(--wine));display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--gold)">${initials}</div>`
+      }
+      <div>
+        <div class="toca-badge-name">${name}</div>
+        <div class="toca-badge-sub">Membro do Filópaluza</div>
+        <div class="toca-chip">⚡ Portal Admin</div>
+      </div>
+    </a>`;
+}
+
+// ─── MEMBERS ──────────────────────────────────────
+async function loadMembers() {
+  try {
+    const snap = await getDocs(query(collection(db, 'members'), orderBy('joinedAt', 'asc')));
+    membersCache = snap.docs.map(d => ({ id: d.id, data: d.data() }));
+    renderMembers();
+  } catch(e) {
+    console.error('Load members error:', e);
+    document.getElementById('membrosGrid').innerHTML = '<p style="color:var(--smoke);font-style:italic">Erro ao carregar membros.</p>';
+  }
+}
+
+function renderMembers() {
+  const grid = document.getElementById('membrosGrid');
+  if (!grid) return;
+  if (!membersCache.length) {
+    grid.innerHTML = '<p style="color:var(--smoke);font-style:italic">Nenhum membro cadastrado ainda.</p>';
+    return;
+  }
+  grid.innerHTML = membersCache.map(({ id, data: m }) => {
+    const initials = (m.name || '?').split(' ').map(w => w[0] || '').join('').slice(0, 2).toUpperCase();
+    const avatar = m.photoURL
+      ? `<img src="${m.photoURL}" alt="${m.name}" loading="lazy">`
+      : initials;
+    const instruments = (m.instruments || []).map(i =>
+      `<span class="instrument-tag">${i}</span>`
+    ).join('');
+
+    let recsHtml = '';
+    const recs = m.recommendations || [];
+    if (recs.length) {
+      const items = recs.filter(r => r.value).map(r => {
+        const thumb = r.imageUrl
+          ? `<div class="member-rec-thumb"><img src="${r.imageUrl}" alt="${r.label}" loading="lazy"></div>`
+          : `<div class="member-rec-thumb"><div class="member-rec-thumb-fallback">♪</div></div>`;
+        const link = r.link ? `<a href="${r.link}" target="_blank" rel="noopener" class="member-rec-link">🔗 Abrir</a>` : '';
+        return `<div class="member-rec-item">
+          ${thumb}
+          <div class="member-rec-copy">
+            <div class="member-rec-label">${r.label || 'Indicação'}</div>
+            <span class="member-rec-value">${r.value}</span>
+            ${link}
+          </div>
+        </div>`;
+      }).join('');
+      if (items) {
+        recsHtml = `<div class="member-recommendations">
+          <div class="member-rec-title">Indicações</div>
+          <div class="member-rec-grid">${items}</div>
+        </div>`;
+      }
+    }
+
+    return `<div class="member-card" onclick="isMember && openMemberModal('${id}')">
+      <div class="member-edit-hint">Clique para editar</div>
+      <div class="member-avatar">${avatar}</div>
+      <div class="member-name">${m.name || 'Sem nome'}</div>
+      <div class="member-instruments">${instruments}</div>
+      ${m.joinedAt ? `<div class="member-since">Desde ${formatTs(m.joinedAt)}</div>` : ''}
+      ${recsHtml}
+      ${isMember ? `<button class="remove-btn" onclick="event.stopPropagation();removeMember('${id}')" title="Remover membro">✕</button>` : ''}
+    </div>`;
+  }).join('');
+}
+
+window.openAddMember = () => {
+  if (!isMember) return;
+  editingMemberId = null;
+  renderMemberForm(null);
+  document.getElementById('memberModalTitle').textContent = 'Adicionar Membro';
+  document.getElementById('memberModal').classList.add('show');
+};
+
+window.openMemberModal = async (id) => {
+  if (!isMember) return;
+  editingMemberId = id;
+  const entry = membersCache.find(e => e.id === id);
+  renderMemberForm(entry?.data || null);
+  document.getElementById('memberModalTitle').textContent = 'Editar Perfil';
+  document.getElementById('memberModal').classList.add('show');
+};
+
+window.closeMemberModal = () => {
+  document.getElementById('memberModal').classList.remove('show');
+  editingMemberId = null;
+};
+
+function renderMemberForm(m) {
+  const body = document.getElementById('memberModalBody');
+  const photoUrl = m?.photoURL || '';
+  const instChecks = INSTRUMENTS.map(i => {
+    const checked = (m?.instruments || []).includes(i) ? 'checked' : '';
+    return `<input type="checkbox" class="inst-cb" id="inst_${i}" ${checked}><label class="inst-label" for="inst_${i}">${i}</label>`;
+  }).join('');
+
+  const recs = m?.recommendations || [{label:'Sertanejo favorito',value:'',imageUrl:'',link:''},{label:'Show inesquecível',value:'',imageUrl:'',link:''},{label:'Indicação livre',value:'',imageUrl:'',link:''}];
+  const recCards = recs.slice(0,3).map((r,i) => `
+    <div class="member-rec-edit-card">
+      <div class="member-rec-edit-title">✦ ${r.label || `Indicação ${i+1}`}</div>
+      <div class="form-group" style="margin-bottom:.6rem">
+        <label>Rótulo</label>
+        <input type="text" class="rec-label" value="${r.label||''}" placeholder="Ex: Sertanejo favorito">
+      </div>
+      <div class="form-group" style="margin-bottom:.6rem">
+        <label>Conteúdo</label>
+        <input type="text" class="rec-value" value="${r.value||''}" placeholder="Ex: Fernando & Sorocaba">
+      </div>
+      <div class="form-group" style="margin-bottom:.6rem">
+        <label>Link (opcional)</label>
+        <input type="url" class="rec-link" value="${r.link||''}" placeholder="https://...">
+      </div>
+      <div class="member-rec-edit-thumb-row">
+        <div class="form-group" style="flex:1">
+          <label>Imagem URL (opcional)</label>
+          <input type="url" class="rec-image" value="${r.imageUrl||''}" placeholder="https://...">
+        </div>
+        ${r.imageUrl ? `<img src="${r.imageUrl}" class="member-rec-edit-preview" style="display:block" alt="">` : `<img class="member-rec-edit-preview" alt="">`}
+      </div>
+    </div>`).join('');
+
+  body.innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:1.2rem">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Nome</label>
+          <input type="text" id="mName" value="${m?.name||''}" placeholder="Seu nome">
+        </div>
+        <div class="form-group">
+          <label>Foto de Perfil</label>
+          <div class="img-upload-area" onclick="triggerAvatarUpload()">
+            <img class="img-preview" id="avatarPreview" src="${photoUrl}" style="${photoUrl?'display:block':''}">
+            <div class="img-upload-hint">📷 Clique para enviar foto</div>
+            <input type="file" id="avatarFile" accept="image/*" style="display:none" onchange="handleAvatarSelect(event)">
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Instrumentos / Habilidades</label>
+        <div class="instruments-check">${instChecks}</div>
+      </div>
+      <div style="margin-top:.5rem">
+        <p style="font-family:'Playfair Display',serif;font-size:.76rem;color:var(--gold);letter-spacing:.1em;text-transform:uppercase;margin-bottom:1rem">✦ Indicações</p>
+        <div class="member-rec-form-grid">${recCards}</div>
+      </div>
+      <div style="display:flex;gap:.8rem;justify-content:flex-end;margin-top:.5rem">
+        <button class="btn-ghost btn-sm" onclick="closeMemberModal()">Cancelar</button>
+        <button class="btn btn-sm" onclick="saveMember()">💾 Salvar</button>
+      </div>
+    </div>`;
+
+  // Preview for rec images
+  body.querySelectorAll('.rec-image').forEach((inp, i) => {
+    const prev = body.querySelectorAll('.member-rec-edit-preview')[i];
+    inp.addEventListener('input', () => {
+      if (inp.value) { prev.src = inp.value; prev.style.display='block'; }
+      else prev.style.display='none';
+    });
+  });
+}
+
+window.triggerAvatarUpload = () => document.getElementById('avatarFile').click();
+
+window.handleAvatarSelect = (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => openCrop(ev.target.result);
+  reader.readAsDataURL(file);
+};
+
+window.saveMember = async () => {
+  if (!isMember) return;
+  const name = document.getElementById('mName').value.trim();
+  if (!name) { showToast('⚠ Preencha o nome'); return; }
+  const instruments = [...document.querySelectorAll('.inst-cb:checked')].map(c => c.id.replace('inst_',''));
+  const recLabels  = [...document.querySelectorAll('.rec-label')].map(i => i.value.trim());
+  const recValues  = [...document.querySelectorAll('.rec-value')].map(i => i.value.trim());
+  const recLinks   = [...document.querySelectorAll('.rec-link')].map(i => i.value.trim());
+  const recImages  = [...document.querySelectorAll('.rec-image')].map(i => i.value.trim());
+  const recommendations = recLabels.map((l,i) => ({ label:l||`Indicação ${i+1}`, value:recValues[i]||'', link:recLinks[i]||'', imageUrl:recImages[i]||'' })).filter(r=>r.value);
+
+  const prev = document.getElementById('avatarPreview');
+  const photoURL = prev?.src?.startsWith('http') ? prev.src : (membersCache.find(e=>e.id===editingMemberId)?.data?.photoURL || '');
+
+  const payload = { name, instruments, recommendations, photoURL, updatedAt: serverTimestamp() };
+  try {
+    if (editingMemberId) {
+      await updateDoc(doc(db,'members',editingMemberId), payload);
+      showToast('✓ Perfil atualizado!');
+    } else {
+      payload.joinedAt = serverTimestamp();
+      await addDoc(collection(db,'members'), payload);
+      showToast('✓ Membro adicionado!');
+    }
+    closeMemberModal();
+    await loadMembers();
+  } catch(e) {
+    console.error('saveMember error:', e);
+    showToast('⚠ Erro ao salvar perfil');
+  }
+};
+
+window.removeMember = async (id) => {
+  if (!confirmAction('Remover este membro?')) return;
+  await deleteDoc(doc(db,'members',id));
+  await loadMembers();
+  showToast('Membro removido.');
+};
+
+// ─── PHOTO CROP ───────────────────────────────────
+function openCrop(dataUrl) {
+  const overlay = document.getElementById('photoCropOverlay');
+  overlay.style.display = 'flex';
+  cropCanvas = document.getElementById('photoCropCanvas');
+  cropCtx = cropCanvas.getContext('2d');
+  cropImg = new Image();
+  cropZoom = 1; cropX = 0; cropY = 0;
+  document.getElementById('photoCropZoom').value = 1;
+  cropImg.onload = () => { cropCanvas.width = cropCanvas.offsetWidth; cropCanvas.height = cropCanvas.offsetHeight; drawCrop(); };
+  cropImg.src = dataUrl;
+
+  const stage = document.getElementById('photoCropStage');
+  stage.onpointerdown = e => { cropDragging=true; cropLastX=e.clientX; cropLastY=e.clientY; stage.setPointerCapture(e.pointerId); };
+  stage.onpointermove = e => { if(!cropDragging) return; cropX+=e.clientX-cropLastX; cropY+=e.clientY-cropLastY; cropLastX=e.clientX; cropLastY=e.clientY; drawCrop(); };
+  stage.onpointerup = () => cropDragging=false;
+  document.getElementById('photoCropZoom').oninput = e => { cropZoom=parseFloat(e.target.value); drawCrop(); };
+}
+
+function drawCrop() {
+  if (!cropCtx || !cropImg) return;
+  const W = cropCanvas.width, H = cropCanvas.height;
+  cropCtx.clearRect(0,0,W,H);
+  const iw = cropImg.width * cropZoom, ih = cropImg.height * cropZoom;
+  cropCtx.drawImage(cropImg, W/2 - iw/2 + cropX, H/2 - ih/2 + cropY, iw, ih);
+}
+
+window.cancelCrop = () => { document.getElementById('photoCropOverlay').style.display='none'; };
+
+window.confirmCrop = async () => {
+  const SIZE = 320;
+  const offscreen = document.createElement('canvas');
+  offscreen.width = offscreen.height = SIZE;
+  const ctx = offscreen.getContext('2d');
+  const scale = SIZE / cropCanvas.offsetWidth;
+  const iw = cropImg.width * cropZoom * scale, ih = cropImg.height * cropZoom * scale;
+  ctx.drawImage(cropImg, SIZE/2 - iw/2 + cropX*scale, SIZE/2 - ih/2 + cropY*scale, iw, ih);
+
+  offscreen.toBlob(async blob => {
+    const user = auth.currentUser;
+    if (!user) { showToast('⚠ Faça login primeiro'); return; }
+    const path = `members/${user.uid}/avatar.jpg`;
+    const ref = storageRef(null, path);
+    // Use storage directly
+    try {
+      const { getStorage, ref: sRef, uploadBytes, getDownloadURL: gDU } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js');
+      // We'll use our imported storage directly
+    } catch {}
+
+    // Direct upload using Firebase Storage
+    const { storage: st } = await import('./firebase-init.js').then(m => ({ storage: m.storage })).catch(() => ({}));
+
+    showToast('⏳ Enviando foto...');
+    const fRef = storageRef(st, `members/${user.uid}/avatar.jpg`);
+    const uploadTask = uploadBytesResumable(fRef, blob, { contentType:'image/jpeg' });
+    uploadTask.on('state_changed', null, err => showToast('⚠ Erro no upload'), async () => {
+      const url = await getDownloadURL(uploadTask.snapshot.ref);
+      const prev = document.getElementById('avatarPreview');
+      if (prev) { prev.src = url; prev.style.display='block'; }
+      document.getElementById('photoCropOverlay').style.display='none';
+      showToast('✓ Foto carregada!');
+    });
+  }, 'image/jpeg', 0.88);
+};
+
+// ─── PROMOTION COUNTDOWN ──────────────────────────
+async function updatePromotionCountdowns() {
+  try {
+    const now = Date.now();
+    let state = {};
+    try {
+      const snap = await getDoc(promotionStateRef);
+      state = snap.exists() ? (snap.data() || {}) : {};
+    } catch {}
+    if (state.promotionPaused === true) { renderPromotionNav(0, true); return; }
+    const stateNext = toDateOrNull(state.nextPromotionDate);
+    const nextDate  = stateNext || getNextFriday(new Date(now + 60000));
+    renderPromotionNav(nextDate.getTime() - now);
+  } catch(e) { console.error('[COUNTDOWN]', e); }
+}
+
+function getNextFriday(from = new Date()) {
+  const d = new Date(from); d.setSeconds(0,0);
+  let days = (5 - d.getDay() + 7) % 7;
+  if (days === 0 && d.getHours() >= 23 && d.getMinutes() >= 59) days = 7;
+  d.setDate(d.getDate() + days);
+  d.setHours(23,59,0,0);
+  return d;
+}
+
+function toDateOrNull(v) {
+  if (!v) return null;
+  if (typeof v.toDate === 'function') return v.toDate();
+  const d = new Date(v);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+function renderPromotionNav(timeUntil, paused = false) {
+  const days  = Math.floor(timeUntil / 86400000);
+  const hours = Math.floor((timeUntil % 86400000) / 3600000);
+  const mins  = Math.floor((timeUntil % 3600000) / 60000);
+  const label = days > 0 ? `${days}d ${hours}h` : hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
+  const show  = !paused && timeUntil > 0 && timeUntil < 7 * 86400000;
+  ['promoCountdownNav','promoCountdownNavMobile'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.textContent = label; el.style.display = show ? 'inline-block' : 'none'; }
+  });
+}
+
+// ─── MOBILE NAV ───────────────────────────────────
+window.toggleMobileMenu = () => {
+  document.getElementById('navMobileMenu').classList.toggle('open');
+  document.getElementById('navHamburger').classList.toggle('open');
+};
+window.closeMobileMenu = () => {
+  document.getElementById('navMobileMenu').classList.remove('open');
+  document.getElementById('navHamburger').classList.remove('open');
+};
+
+// ─── WAKEUP ───────────────────────────────────────
+window.addEventListener('load', () => {
+  const overlay = document.getElementById('loadingOverlay');
+  if (overlay) { overlay.classList.add('fade-out'); setTimeout(() => overlay.remove(), 500); }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0D0805">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="imagens/filopaluza_logo.png">
+<title>Sugestões & Enquetes — Filópaluza</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cinzel:wght@400;700;900&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- LOADING -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-title">Filópaluza</div>
+  <div class="loading-bar"><div class="loading-fill"></div></div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">Filópaluza</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="sugestoes.html" style="color:var(--gold)">Sugestões</a></li>
+    <li style="position:relative"><a href="enquetes.html">Enquetes <span id="promoCountdownNav" class="badge-new" style="display:none"></span></a></li>
+        <li><a href="repertorio.html">Repertório</a></li>
+        <li class="member-admin-only"><a href="logs.html" style="color:var(--amber)">⚡ Admin</a></li>
+      </ul>
+  <div class="nav-auth">
+    <span class="nav-user" id="navUser" style="display:none">🤠 Membro</span>
+    
+    <button class="btn-ghost btn-sm" id="loginBtn" onclick="openLogin()">Entrar</button>
+    <button class="btn-ghost btn-sm" id="logoutBtn" onclick="doLogout()" style="display:none">Sair</button>
+  </div>
+  <button class="nav-hamburger" id="navHamburger" onclick="toggleMobileMenu()">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="nav-mobile-menu" id="navMobileMenu">
+  <a href="index.html">Home</a>
+  <a href="sugestoes.html" style="color:var(--gold)">Sugestões</a>
+  <a href="enquetes.html">Enquetes <span class="badge-mobile-inline" id="promoCountdownNavMobile" style="display:none"></span></a>
+    <a href="repertorio.html">Repertório</a>
+    <a href="logs.html" id="adminLinkMobile" class="member-admin-only" style="color:var(--amber)">⚡ Portal Admin</a>
+    <div style="border-top:1px solid rgba(200,130,10,.1);margin-top:.5rem;padding:1rem 2rem;display:flex;flex-direction:column;gap:.8rem">
+    <span class="nav-user" id="navUserMobile" style="display:none;text-align:center">🤠 Membro</span>
+    
+    <button class="btn-ghost" id="loginBtnMobile" onclick="openLoginMobile()">Entrar</button>
+    <button class="btn-ghost" id="logoutBtnMobile" onclick="doLogout()" style="display:none">Sair</button>
+  </div>
+</div>
+
+<main style="padding-top: 80px; max-width: 1100px; margin: 0 auto;">
+  
+  <!-- 02 SUGESÕES -->
+  <section id="sugestoes" style="padding: 4rem 1.5rem 2rem;">
+    <div class="section-header" style="position: static; margin-bottom: 2rem;">
+      <div class="section-number">01</div>
+      <div class="section-title-wrap"><h2>Sugestões de Músicas</h2><p>Proponha músicas para os próximos ensaios</p></div>
+      <div class="section-line"></div>
+    </div>
+    
+    <div class="member-only">
+      <div class="form-card">
+        <div class="form-row">
+          <div class="form-group"><label>Música</label><input type="text" id="sugSong" placeholder="Nome da música"></div>
+          <div class="form-group"><label>Artista / Banda</label><input type="text" id="sugArtist" placeholder="Ex: Led Zeppelin"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Quem sugere</label><input type="text" id="sugBy" readonly style="background:rgba(200,130,10,0.05);color:var(--smoke);cursor:not-allowed"></div>
+          <div class="form-group"><label>Link YouTube (opcional)</label><input type="url" id="sugYt" placeholder="https://youtube.com/..."></div>
+        </div>
+        <div class="form-row full">
+          <div class="form-group"><label>Observação (opcional)</label><input type="text" id="sugNote" placeholder="Ex: pra fechar o set"></div>
+        </div>
+        <button class="btn" onclick="addSuggestion()">Enviar Sugestão</button>
+      </div>
+    </div>
+    <div id="promotionCountdownBanner"></div>
+    <p id="suggestionsNotice" style="display:none;color:var(--smoke);font-style:italic;font-size:.88rem;margin-top:1rem">Faça login para sugerir músicas.</p>
+    <div class="suggestions-list" id="suggestionsList"></div>
+  </section>
+
+
+</main>
+
+<!-- LOGIN MODAL -->
+<div class="modal-overlay" id="loginModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeLogin()">✕</button>
+    <div class="modal-title">Entrar no Filópaluza</div>
+    <div class="modal-subtitle">Acesso restrito para banda e interações</div>
+    <div id="loginStep1">
+      <button class="btn-google" onclick="doGoogleLogin()">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.569 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.707A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.707V4.961H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.039l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.961L3.964 6.293C4.672 4.166 6.656 3.58 9 3.58z"/></svg>
+        Entrar com Google
+      </button>
+    </div>
+    <div class="modal-error" id="loginError">Erro ao autenticar. Tente novamente.</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- CONFIRM HELPER -->
+<script>
+window.confirmAction = (msg) => confirm(msg);
+</script>
+
+<!-- FIREBASE & CORE SCRIPT -->
+<script type="module">
+import {
+  db, auth, provider,
+  collection, doc, onSnapshot, addDoc, deleteDoc, updateDoc, setDoc, getDoc, getDocs, orderBy, query, serverTimestamp, runTransaction, Timestamp, increment,
+  signInWithPopup, signOut, onAuthStateChanged
+} from "./firebase-init.js";
+
+// --- STATE ---
+let isLoggedIn = false;
+let isMember = false;
+let currentSection = 'sugestoes';
+let suggestionsLoaded = false;
+let pollsLoaded = false;
+
+// Global settings
+const FUNCTIONS_BASE_URL = 'https://us-central1-filopaluza.cloudfunctions.net';
+const promotionStateRef = doc(db, 'promotion_state', 'current');
+const PROMOTION_LOCK_MS = 2 * 60 * 1000;
+
+// --- TOAST UTILS ---
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3200);
+}
+
+// --- UTILITY FUNCTIONS ---
+function formatTs(ts) {
+  if (!ts) return '';
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  if (isNaN(d)) return '';
+  const day = String(d.getDate()).padStart(2,'0');
+  const mon = String(d.getMonth()+1).padStart(2,'0');
+  const h   = String(d.getHours()).padStart(2,'0');
+  const m   = String(d.getMinutes()).padStart(2,'0');
+  return `${day}/${mon} ${h}:${m}`;
+}
+
+function formatTsFull(ts) {
+  return formatTs(ts);
+}
+
+function getYtId(url) {
+  if (!url) return null;
+  const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([A-Za-z0-9_-]{11})/);
+  return m ? m[1] : null;
+}
+
+function ytBtn(url) {
+  if (!url) return '';
+  const id = getYtId(url);
+  if (id) {
+    return `<a href="${url}" target="_blank" onclick="event.stopPropagation()" title="Abrir no YouTube" style="display:inline-block;flex-shrink:0;text-decoration:none">
+      <div style="position:relative;width:80px;height:45px;border-radius:2px;overflow:hidden;border:1px solid rgba(200,130,10,.3);transition:border-color .2s" onmouseover="this.style.borderColor='var(--amber)'" onmouseout="this.style.borderColor='rgba(200,130,10,.3)'">
+        <img src="https://img.youtube.com/vi/${id}/mqdefault.jpg" alt="YouTube" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block">
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.3);transition:background .2s" onmouseover="this.style.background='rgba(0,0,0,.15)'" onmouseout="this.style.background='rgba(0,0,0,.3)'">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="12" fill="rgba(255,0,0,.85)"/><polygon points="9.5,7 18,12 9.5,17" fill="white"/></svg>
+        </div>
+      </div>
+    </a>`;
+  }
+  return `<a href="${url}" target="_blank" class="btn-icon" onclick="event.stopPropagation()">▶ YouTube</a>`;
+}
+
+function buildMusicSearchTerm(song, artist='') {
+  return encodeURIComponent(`${song || ''} ${artist || ''}`.trim());
+}
+
+function ytSearchBtn(song, artist='') {
+  const term = buildMusicSearchTerm(song, artist);
+  return `<a href="https://www.youtube.com/results?search_query=${term}" target="_blank" class="btn-icon" onclick="event.stopPropagation()">🔎 Buscar video</a>`;
+}
+
+async function fetchFunctionJson(path, params={}) {
+  const url = new URL(`${FUNCTIONS_BASE_URL}/${path}`);
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && `${value}`.trim() !== '') url.searchParams.set(key, value);
+  });
+  const resp = await fetch(url.toString());
+  const data = await resp.json().catch(() => ({}));
+  if (!resp.ok || data.ok === false) throw new Error(data.error || 'Não foi possível concluir a busca automática.');
+  return data;
+}
+
+// --- LOGGING ---
+async function writeLog(action, detail, category) {
+  const user = auth.currentUser;
+  try {
+    await addDoc(collection(db,'logs'), {
+      action,
+      detail,
+      category,
+      who: user?.displayName || user?.email || 'Membro',
+      whoEmail: user?.email || '',
+      ts: serverTimestamp(),
+      tsLocal: new Date().toLocaleString('pt-BR')
+    });
+  } catch (e) {
+    console.warn('Write log error:', e);
+  }
+}
+
+// --- ROLE AUTH ---
+async function isEmailApproved(email) {
+  const snap = await getDoc(doc(db, 'approved_emails', email.toLowerCase()));
+  return snap.exists();
+}
+
+// --- LOGINS ---
+window.openLogin = () => {
+  document.getElementById('loginModal').classList.add('show');
+};
+window.closeLogin = () => {
+  document.getElementById('loginModal').classList.remove('show');
+};
+window.openLoginMobile = () => {
+  closeMobileMenu();
+  openLogin();
+};
+
+window.doGoogleLogin = async () => {
+  try {
+    await signInWithPopup(auth, provider);
+    closeLogin();
+  } catch (e) {
+    if (e.code !== 'auth/popup-closed-by-user') {
+      document.getElementById('loginError').classList.add('show');
+    }
+  }
+};
+
+window.doLogout = async () => {
+  await signOut(auth);
+  showToast('Até logo!');
+};
+
+// --- AUTH LISTENER ---
+onAuthStateChanged(auth, async user => {
+  if (user) {
+    const approved = await isEmailApproved(user.email);
+    isMember = approved;
+    isLoggedIn = true;
+    const firstName = user.displayName?.split(' ')[0] || user.email?.split('@')[0] || 'Visitante';
+    document.getElementById('navUser').textContent       = `🤠 ${firstName}`;
+    document.getElementById('navUserMobile').textContent = `🤠 ${firstName}`;
+  } else {
+    isLoggedIn = false;
+    isMember   = false;
+  }
+  const isAuditAdmin = isLoggedIn && (auth.currentUser?.email || '').toLowerCase() === 'juliocereser@gmail.com';
+  document.body.classList.toggle('is-audit-admin', isAuditAdmin);
+  applyAuth();
+  loadSuggestionsSnapshot(true);
+  loadPollsSnapshot(true);
+});
+
+function applyAuth() {
+  document.body.classList.toggle('logged-in', isLoggedIn);
+  document.body.classList.toggle('is-member', isMember);
+  
+  document.getElementById('loginBtn').style.display  = isLoggedIn ? 'none' : '';
+  document.getElementById('logoutBtn').style.display = isLoggedIn ? '' : 'none';
+  document.getElementById('navUser').style.display   = isLoggedIn ? '' : 'none';
+  
+  
+  document.getElementById('loginBtnMobile').style.display  = isLoggedIn ? 'none' : '';
+  document.getElementById('logoutBtnMobile').style.display = isLoggedIn ? '' : 'none';
+  document.getElementById('navUserMobile').style.display   = isLoggedIn ? '' : 'none';
+  
+  const sugNotice = document.getElementById('suggestionsNotice');
+  if (sugNotice) sugNotice.style.display = isLoggedIn ? 'none' : '';
+
+  // Expose member elements
+  document.querySelectorAll('.member-only').forEach(el => {
+    el.style.display = isMember ? 'block' : 'none';
+  });
+
+  if (isLoggedIn) {
+    const userName = auth.currentUser?.displayName?.split(' ').slice(0,2).join(' ') || auth.currentUser?.email?.split('@')[0] || 'Membro';
+    const sugByEl = document.getElementById('sugBy');
+    if (sugByEl) sugByEl.value = userName;
+  }
+}
+
+// --- SUGGESTIONS LOGIC ---
+let suggestionsCache = [];
+
+function getSuggestionScore(s) {
+  return (s.likes||0) - (s.dislikes||0);
+}
+
+async function loadSuggestionsSnapshot(force = false) {
+  if (suggestionsLoaded && !force) return;
+  const snap = await getDocs(query(collection(db,'suggestions'), orderBy('createdAt','desc')));
+  suggestionsCache = snap.docs.map(d => ({id: d.id, data: d.data()}));
+  suggestionsLoaded = true;
+  renderSuggestions();
+  setTimeout(() => updatePromotionCountdowns(), 100);
+}
+
+function renderSuggestions() {
+  const list = document.getElementById('suggestionsList');
+  if (!list) return;
+  if (!suggestionsCache.length) {
+    list.classList.remove('scroll-limited');
+    list.style.maxHeight = '';
+    list.innerHTML='<p style="color:var(--smoke);font-style:italic;padding:1rem 0">Nenhuma sugestão ainda.</p>';
+    return;
+  }
+
+  const uid = auth.currentUser?.uid || null;
+  const sorted = [...suggestionsCache].sort((a,b) => {
+    const sa = getSuggestionScore(a.data), sb = getSuggestionScore(b.data);
+    if (sb !== sa) return sb - sa;
+    return (b.data.likes||0) - (a.data.likes||0);
+  });
+
+  const trophies = ['🥇','🥈','🥉'];
+
+  list.innerHTML = sorted.map(({id, data: s}, i) => {
+    const score     = getSuggestionScore(s);
+    const myVote    = uid && s.voterMap ? s.voterMap[uid] : null;
+    const rankClass = i < 3 ? ` rank-${i+1}` : '';
+    const trophy    = i < 3 ? `<span class="suggestion-trophy">${trophies[i]}</span>` : `<span class="suggestion-rank">${i+1}</span>`;
+
+    let isTie = false;
+    if (i < 3) {
+      isTie = sorted.some((other, idx) => {
+        if (idx === i) return false;
+        if (idx >= 3) return false;
+        return getSuggestionScore(other.data) === score && (other.data.likes || 0) === (s.likes || 0);
+      });
+    }
+
+    const likeBtn = `<button class="vote-btn${myVote==='like'?' liked':''}"
+      onclick="voteSuggestion('${id}','like')"
+      ${!isMember?'disabled title="Acesso restrito a membros"':''}
+      title="${myVote==='like'?'Remover like':'Curtir'}">
+      👍 <span class="score-num">${s.likes||0}</span>
+    </button>`;
+
+    const dislikeBtn = `<button class="vote-btn${myVote==='dislike'?' disliked':''}"
+      onclick="voteSuggestion('${id}','dislike')"
+      ${!isMember?'disabled title="Acesso restrito a membros"':''}
+      title="${myVote==='dislike'?'Remover dislike':'Não curtir'}">
+      👎 <span class="score-num">${s.dislikes||0}</span>
+    </button>`;
+
+    const rmBtn = isMember ? `<button class="btn-ghost btn-sm" onclick="removeSuggestion('${id}')">✕</button>` : '';
+
+    return `<div class="suggestion-item${rankClass}">
+      ${trophy}
+      <div class="suggestion-main">
+        <div class="suggestion-song">${s.song}${isTie ? '<span class="tie-tag">Empate</span>' : ''}</div>
+        <div class="suggestion-artist">${s.artist}</div>
+        ${s.note ? `<div class="suggestion-note">${s.note}</div>` : ''}
+      </div>
+      <div class="suggestion-by">por ${s.by}${s.createdAt ? ` · <small style="color:var(--smoke)">${formatTs(s.createdAt)}</small>` : ''}</div>
+      <div class="suggestion-actions">
+        ${s.youtube ? ytBtn(s.youtube) : `<button class="btn-icon" onclick="findSuggestionYoutube('${id}');event.stopPropagation()">⚡ Auto vídeo</button>${ytSearchBtn(s.song, s.artist)}`}
+        <div class="suggestion-score">${likeBtn}${dislikeBtn}</div>
+        ${rmBtn}
+      </div>
+    </div>`;
+  }).join('');
+
+  applySuggestionsViewportLimit();
+}
+
+function applySuggestionsViewportLimit() {
+  const list = document.getElementById('suggestionsList');
+  if (!list) return;
+  const items = Array.from(list.querySelectorAll('.suggestion-item'));
+  if (items.length <= 20) {
+    list.classList.remove('scroll-limited');
+    list.style.maxHeight = '';
+    return;
+  }
+  const styles = getComputedStyle(list);
+  const gap = parseFloat(styles.rowGap || styles.gap || '0') || 0;
+  const visibleItems = items.slice(0, 20);
+  const totalHeight = visibleItems.reduce((sum, item) => sum + item.offsetHeight, 0) + gap * Math.max(visibleItems.length - 1, 0);
+  list.style.maxHeight = `${Math.ceil(totalHeight)}px`;
+  list.classList.add('scroll-limited');
+}
+
+window.addEventListener('resize', applySuggestionsViewportLimit);
+
+window.voteSuggestion = async (id, type) => {
+  if (!isMember) { showToast('⚠ Acesso restrito a membros'); return; }
+  const uid  = auth.currentUser?.uid;
+  const snap = await getDoc(doc(db,'suggestions',id));
+  if (!snap.exists()) return;
+  const s = snap.data();
+
+  const voterMap = {...(s.voterMap||{})};
+  const current  = voterMap[uid];
+  let likes    = s.likes    || 0;
+  let dislikes = s.dislikes || 0;
+
+  if (current === type) {
+    if (type === 'like')    likes--;
+    if (type === 'dislike') dislikes--;
+    delete voterMap[uid];
+  } else {
+    if (current === 'like')    likes--;
+    if (current === 'dislike') dislikes--;
+    if (type === 'like')    likes++;
+    if (type === 'dislike') dislikes++;
+    voterMap[uid] = type;
+  }
+
+  // AUTO REMOVAL LIMIT DISLIKES
+  if (dislikes >= 3) {
+    await deleteDoc(doc(db, 'suggestions', id));
+    await addDoc(collection(db,'logs'), {
+      action: 'Sugestão Removida',
+      detail: `${s.song} — ${s.artist} · ${likes}👍 ${dislikes}👎 · Motivo: Atingiu o limite de 3 dislikes`,
+      song: s.song,
+      artist: s.artist,
+      by: s.by,
+      likes: likes,
+      dislikes: dislikes,
+      reason: 'Atingiu o limite de 3 dislikes',
+      removedBy: 'Sistema',
+      category: 'sugestoes',
+      who: 'Sistema',
+      whoEmail: '',
+      ts: serverTimestamp(),
+      tsLocal: new Date().toLocaleString('pt-BR')
+    });
+    await loadSuggestionsSnapshot(true);
+    showToast('🗑 Sugestão removida (4+ dislikes)');
+    return;
+  }
+
+  await updateDoc(doc(db, 'suggestions', id), { likes, dislikes, voterMap });
+  await loadSuggestionsSnapshot(true);
+};
+
+window.removeSuggestion = async id => {
+  const snap = await getDoc(doc(db,'suggestions',id));
+  if (!snap.exists()) return;
+  const s = snap.data();
+
+  const reason = prompt(`Removendo: ${s.song}\nMotivo da remoção (opcional):`);
+  if (reason === null) return;
+
+  await deleteDoc(doc(db,'suggestions',id));
+  await addDoc(collection(db,'logs'), {
+    action: 'Sugestão Removida',
+    detail: `${s.song} — ${s.artist} · ${s.likes || 0}👍 ${s.dislikes || 0}👎 · Motivo: ${reason || 'Removido pelo moderador'}`,
+    song: s.song,
+    artist: s.artist,
+    by: s.by,
+    likes: s.likes || 0,
+    dislikes: s.dislikes || 0,
+    reason: reason || 'Removido pelo moderador',
+    removedBy: auth.currentUser?.displayName?.split(' ')[0] || 'Membro',
+    category: 'sugestoes',
+    who: auth.currentUser?.displayName || auth.currentUser?.email || 'Membro',
+    whoEmail: auth.currentUser?.email || '',
+    ts: serverTimestamp(),
+    tsLocal: new Date().toLocaleString('pt-BR')
+  });
+  await loadSuggestionsSnapshot(true);
+  showToast('Sugestão removida.');
+};
+
+window.addSuggestion = async () => {
+  if (!isLoggedIn) { showToast('⚠ Faça login para sugerir músicas'); return; }
+  const song   = document.getElementById('sugSong').value.trim();
+  const artist = document.getElementById('sugArtist').value.trim();
+  const by     = document.getElementById('sugBy').value.trim();
+  const youtube= document.getElementById('sugYt').value.trim();
+  const note   = document.getElementById('sugNote').value.trim();
+
+  if (!song || !artist) { showToast('⚠ Preencha música e artista'); return; }
+
+  try {
+    await addDoc(collection(db, 'suggestions'), {
+      song, artist, by, youtube, note,
+      createdAt: serverTimestamp(),
+      likes: 0,
+      dislikes: 0,
+      voterMap: {}
+    });
+    await loadSuggestionsSnapshot(true);
+    await writeLog('Sugestão enviada', `${song} — ${artist} (por ${by})`, 'sugestoes');
+    ['sugSong','sugArtist','sugYt','sugNote'].forEach(id => document.getElementById(id).value = '');
+    showToast('✓ Sugestão enviada com sucesso!');
+  } catch (e) {
+    console.error('Add suggestion error:', e);
+    showToast('⚠ Erro ao enviar sugestão');
+  }
+};
+
+window.findSuggestionYoutube = async id => {
+  try {
+    const ref = doc(db, 'suggestions', id);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) return;
+    const s = snap.data();
+    if (s.youtube) {
+      showToast('Esta sugestão já possui vídeo.');
+      return;
+    }
+    showToast('⏳ Buscando vídeo automaticamente...');
+    const data = await fetchFunctionJson('lookup_youtube_link', { song: s.song || '', artist: s.artist || '' });
+    await updateDoc(ref, { youtube: data.url });
+    await writeLog('Link de vídeo localizado', `${s.song} — ${s.artist}`, 'sugestoes');
+    await loadSuggestionsSnapshot(true);
+    showToast('✓ Vídeo encontrado e salvo!');
+  } catch (err) {
+    console.error('Auto suggestion youtube error:', err);
+    showToast(`⚠ ${err.message || 'Não foi possível localizar o vídeo.'}`);
+  }
+};
+
+// --- POLLS LOGIC ---
+let pollsCache = [];
+
+async function loadPollsSnapshot(force = false) {
+  if (pollsLoaded && !force) return;
+  const snap = await getDocs(collection(db,'polls'));
+  const pollSortTime = p => {
+    if (p.createdAt?.toMillis) return p.createdAt.toMillis();
+    if (p.createdAt?.toDate) return p.createdAt.toDate().getTime();
+    if (p.createdAt) return new Date(p.createdAt).getTime() || 0;
+    if (p.deadline) return new Date(p.deadline).getTime() || 0;
+    return 0;
+  };
+  pollsCache = snap.docs
+    .map(d => ({id: d.id, data: d.data()}))
+    .sort((a, b) => pollSortTime(b.data) - pollSortTime(a.data));
+  const uid = auth.currentUser?.uid;
+  let voteLookupCount = 0;
+  if (uid) {
+    const now = Date.now();
+    const voteLookupItems = pollsCache.filter(({ data: p }) => {
+      const deadlineMs = p.deadline ? new Date(p.deadline).getTime() : null;
+      return p.closed !== true && !(deadlineMs && now > deadlineMs);
+    }).slice(0, 20);
+    voteLookupCount = voteLookupItems.length;
+    await Promise.all(voteLookupItems.map(async item => {
+      try {
+        const voteSnap = await getDoc(doc(db, 'polls', item.id, 'votes', uid));
+        if (voteSnap.exists()) {
+          item.data.myVoteIdx = voteSnap.data().optIdx;
+        }
+      } catch (e) {}
+    }));
+  }
+  pollsLoaded = true;
+  renderPolls();
+}
+
+function renderPolls() {
+  const c = document.getElementById('pollsContainer');
+  const hc = document.getElementById('pollsHistoryContainer');
+  const hBtn = document.getElementById('pollsHistoryBtn');
+  const hCount = document.getElementById('pollsClosedCount');
+  if (!c) return;
+  if (!pollsCache.length) {
+    c.innerHTML='<p style="color:var(--smoke);font-style:italic">Nenhuma enquete ainda.</p>';
+    if (hBtn) hBtn.style.display = 'none';
+    return;
+  }
+  const uid = auth.currentUser?.uid || null;
+  const now = Date.now();
+
+  const formatTime = (ms) => {
+    if (ms <= 0) return 'Encerrando...';
+    const days = Math.floor(ms / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((ms % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
+    if (days > 0) return `${days}d ${hours}h`;
+    if (hours > 0) return `${hours}h ${minutes}m`;
+    return `${minutes}m`;
+  };
+
+  const openPolls   = pollsCache.filter(({data:p}) => { const dl = p.deadline ? new Date(p.deadline).getTime() : null; return p.closed !== true && !(dl && now > dl); });
+  const closedPolls = pollsCache.filter(({data:p}) => { const dl = p.deadline ? new Date(p.deadline).getTime() : null; return p.closed === true || (dl && now > dl); });
+
+  if (hBtn) {
+    hBtn.style.display = closedPolls.length ? 'inline-flex' : 'none';
+    if (hCount) hCount.textContent = closedPolls.length;
+  }
+
+  const buildPollCard = ({id, data: p}) => {
+    const deadlineMs  = p.deadline ? new Date(p.deadline).getTime() : null;
+    const isClosed    = p.closed === true || (deadlineMs && now > deadlineMs);
+    const myVoteIdx   = p.myVoteIdx ?? (uid && p.voterMap ? p.voterMap[uid] : null);
+    const hasVoted    = myVoteIdx !== null && myVoteIdx !== undefined;
+    const total       = (p.options||[]).reduce((s,o)=>s+(o.votes||0),0);
+    const canVote     = isMember && !hasVoted && !isClosed;
+
+    let deadlineHtml = '';
+    let countdownBadgeHtml = '';
+    if (deadlineMs && !isClosed) {
+      const diff = deadlineMs - now;
+      const hours = Math.floor(diff / 3600000);
+      const days  = Math.floor(diff / 86400000);
+      const soon  = diff < 86400000;
+      const label = days > 1 ? `Encerra em ${days} dias` : hours > 0 ? `Encerra em ${hours}h` : 'Encerra em breve!';
+      deadlineHtml = `<span class="poll-deadline${soon?' soon':''}">${label} · ${new Date(p.deadline).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</span>`;
+      
+      const timeRemaining = formatTime(diff);
+      const isUrgent = diff < 48 * 60 * 60 * 1000;
+      countdownBadgeHtml = `<div class="countdown-badge ${isUrgent ? 'urgent' : ''}" style="margin-top:.8rem;margin-bottom:.8rem">
+        <span class="countdown-icon">⏱</span> Tempo restante: ${timeRemaining}
+      </div>`;
+    }
+
+    const statusBadge = isClosed
+      ? `<span class="poll-status-closed">🔒 Encerrada</span>`
+      : `<span class="poll-status-open">🟢 Aberta</span>`;
+
+    let winnerHtml = '';
+    if (isClosed && total > 0) {
+      const maxVotes  = Math.max(...(p.options||[]).map(o=>o.votes||0));
+      const winners   = (p.options||[]).filter(o=>(o.votes||0)===maxVotes);
+      winnerHtml = `<div class="poll-winner">🏆 ${winners.length===1?'Vencedor':'Empate'}: ${winners.map(w=>w.label).join(' · ')}</div>`;
+    }
+
+    const bars = (p.options||[]).map((o,i) => {
+      const pct    = total ? Math.round((o.votes||0)/total*100) : 0;
+      return `<div class="poll-bar-item">
+        <div class="poll-bar-label">${o.label}</div>
+        <div class="poll-bar-right">
+          <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.3rem">
+            <div class="poll-bar-track" style="flex:1"><div class="poll-bar-fill" style="width:${pct}%"></div></div>
+            <span class="poll-bar-pct">${pct}% (${o.votes||0})</span>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+
+    const voterName = auth.currentUser?.displayName?.split(' ').slice(0,2).join(' ') || auth.currentUser?.email?.split('@')[0] || 'Membro';
+    const voteForm = canVote ? `
+      <div class="poll-options" style="margin-top:1rem">
+        ${(p.options||[]).map((o,i)=>`<div class="poll-option"><input type="radio" id="p${id}o${i}" name="poll_${id}"><label class="poll-option-label" for="p${id}o${i}"><div class="poll-dot"></div>${o.label}</label></div>`).join('')}
+        <div style="margin-top:.8rem;display:flex;gap:.8rem;align-items:center;flex-wrap:wrap">
+          <span style="font-size:.78rem;color:var(--amber);font-family:'Cinzel',serif">Voto secreto como: ${voterName}</span>
+          <button class="btn btn-sm" onclick="submitPollVote('${id}')">Votar</button>
+        </div>
+      </div>` : '';
+
+    const myVoteLabel   = hasVoted ? `<span class="poll-my-vote">Você já votou nesta enquete.</span>` : '';
+    const changeVoteBtn = isMember && hasVoted && !isClosed ? `<button class="btn-ghost btn-sm" onclick="removePollVote('${id}')">Mudar voto</button>` : '';
+    const closeBtn      = isMember && !isClosed ? `<button class="btn-ghost btn-sm" onclick="closePoll('${id}')">Encerrar</button>` : '';
+    const deleteBtn     = isMember ? `<button class="btn-ghost btn-sm" onclick="deletePoll('${id}')">Excluir</button>` : '';
+
+    const createdLabel = p.createdAt ? `<span style="font-size:.7rem;color:var(--smoke)">Criada em ${formatTs(p.createdAt)}</span>` : '';
+
+    return `<div class="poll-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.6rem;flex-wrap:wrap;gap:.4rem">
+        <div class="poll-question" style="flex:1">${p.question}</div>
+        <div style="display:flex;gap:.4rem;align-items:center;flex-wrap:wrap">${closeBtn}${deleteBtn}</div>
+      </div>
+      <div style="display:flex;gap:.8rem;align-items:center;margin-bottom:.8rem;flex-wrap:wrap">${statusBadge}${deadlineHtml}${createdLabel}</div>
+      ${countdownBadgeHtml}
+      ${bars}
+      ${winnerHtml}
+      ${voteForm}
+      <div class="poll-footer">
+        <span class="poll-total">${total} voto${total!==1?'s':''}</span>
+        <div style="display:flex;gap:.55rem;align-items:center">${myVoteLabel}${changeVoteBtn}</div>
+      </div>
+    </div>`;
+  };
+
+  if (openPolls.length) {
+    c.innerHTML = openPolls.map(buildPollCard).join('');
+  } else {
+    c.innerHTML = '<p style="color:var(--smoke);font-style:italic">Nenhuma enquete aberta no momento.</p>';
+  }
+
+  if (hc) {
+    if (closedPolls.length) {
+      hc.innerHTML = closedPolls.map(buildPollCard).join('');
+    } else {
+      hc.innerHTML = '';
+    }
+  }
+}
+
+window.togglePollsHistory = () => {
+  const hc   = document.getElementById('pollsHistoryContainer');
+  const hBtn = document.getElementById('pollsHistoryBtn');
+  if (!hc) return;
+  const opening = hc.style.display === 'none';
+  hc.style.display = opening ? 'block' : 'none';
+  if (hBtn) hBtn.innerHTML = opening
+    ? `📂 Ocultar histórico`
+    : `🗂 Histórico de enquetes encerradas (<span id="pollsClosedCount">${document.getElementById('pollsClosedCount')?.textContent||''}</span>)`;
+};
+
+window.submitPollVote = async id => {
+  if (!isMember) { showToast('⚠ Acesso restrito a membros'); return; }
+  const uid  = auth.currentUser?.uid;
+  const snap = await getDoc(doc(db,'polls',id));
+  if (!snap.exists()) return;
+  const p = snap.data();
+
+  const deadlineMs = p.deadline ? new Date(p.deadline).getTime() : null;
+  const isClosed   = p.closed === true || (deadlineMs && Date.now() > deadlineMs);
+  if (isClosed) { showToast('Esta enquete já foi encerrada'); return; }
+
+  const alreadyVoted = (p.voterMap && p.voterMap[uid] !== undefined) || (p.voters||[]).some(v => v.uid === uid);
+  if (alreadyVoted) { showToast('Você já votou nesta enquete'); return; }
+
+  let chosen = null;
+  p.options.forEach((_,i) => {
+    if (document.getElementById(`p${id}o${i}`)?.checked) chosen = i;
+  });
+  if (chosen === null) { showToast('⚠ Selecione uma opção'); return; }
+
+  try {
+    const pollRef = doc(db, 'polls', id);
+    const voteRef = doc(db, 'polls', id, 'votes', uid);
+    await runTransaction(db, async transaction => {
+      const pollSnap = await transaction.get(pollRef);
+      if (!pollSnap.exists()) throw new Error('Enquete não encontrada');
+      const poll = pollSnap.data();
+      const voteSnap = await transaction.get(voteRef);
+      const pollDeadlineMs = poll.deadline ? new Date(poll.deadline).getTime() : null;
+      const pollClosed = poll.closed === true || (pollDeadlineMs && Date.now() > pollDeadlineMs);
+      if (pollClosed) throw new Error('Esta enquete já foi encerrada');
+      if (voteSnap.exists() || poll.voterMap?.[uid] !== undefined || (poll.voters || []).some(v => v.uid === uid)) {
+        throw new Error('Você já votou nesta enquete');
+      }
+      const options = poll.options.map((o, i) => ({ ...o, votes: (o.votes || 0) + (i === chosen ? 1 : 0) }));
+      transaction.update(pollRef, { options });
+      transaction.set(voteRef, { optIdx: chosen, createdAt: serverTimestamp() });
+    });
+    await loadPollsSnapshot(true);
+    await writeLog('Voto registrado', `"${p.question}" — voto secreto registrado`, 'enquetes');
+    showToast('✓ Voto registrado!');
+  } catch(e) {
+    console.error('Vote error:', e);
+    showToast(`⚠ ${e.message || 'Erro ao registrar voto.'}`);
+  }
+};
+
+window.removePollVote = async id => {
+  if (!confirmAction('Deseja realmente remover seu voto desta enquete?')) return;
+  const uid = auth.currentUser?.uid; if (!uid) return;
+  try {
+    const pollRef = doc(db, 'polls', id);
+    const voteRef = doc(db, 'polls', id, 'votes', uid);
+    await runTransaction(db, async transaction => {
+      const pollSnap = await transaction.get(pollRef);
+      if (!pollSnap.exists()) throw new Error('Enquete não encontrada');
+      const poll = pollSnap.data();
+      const voteSnap = await transaction.get(voteRef);
+      const oldIdx = voteSnap.exists() ? voteSnap.data().optIdx : poll.voterMap?.[uid];
+      if (oldIdx === undefined || oldIdx === null) throw new Error('Voto não encontrado');
+      const options = poll.options.map((o, i) => ({ ...o, votes: Math.max(0, (o.votes || 0) - (i === oldIdx ? 1 : 0)) }));
+      const voters = (poll.voters || []).filter(v => v.uid !== uid).map(v => ({ uid: v.uid, optIdx: v.optIdx }));
+      const voterMap = { ...(poll.voterMap || {}) };
+      delete voterMap[uid];
+      transaction.update(pollRef, { options, voters, voterMap });
+      if (voteSnap.exists()) transaction.delete(voteRef);
+    });
+    await loadPollsSnapshot(true);
+    showToast('Voto removido. Vote novamente!');
+  } catch (e) {
+    console.error('Remove vote error:', e);
+    showToast(`⚠ ${e.message || 'Erro ao remover voto.'}`);
+  }
+};
+
+window.deletePoll = async id => {
+  if (!confirmAction('Tem certeza que deseja excluir esta enquete?')) return;
+  const snap = await getDoc(doc(db,'polls',id));
+  const q = snap.exists() ? snap.data().question : id;
+  await deleteDoc(doc(db,'polls',id));
+  await loadPollsSnapshot(true);
+  await writeLog('Enquete excluída', q, 'enquetes');
+  showToast('Enquete excluída.');
+};
+
+window.createPoll = async () => {
+  if (!isMember) { showToast('⚠ Acesso restrito a membros'); return; }
+  const q        = document.getElementById('pollQuestion').value.trim();
+  const opts     = Array.from(document.querySelectorAll('.poll-opt-input')).map(i=>i.value.trim()).filter(Boolean);
+  const deadline = document.getElementById('pollDeadline').value;
+  if (!q) { showToast('⚠ Digite a pergunta'); return; }
+  if (opts.length<2) { showToast('⚠ Adicione pelo menos 2 opções'); return; }
+  await addDoc(collection(db,'polls'),{
+    question: q,
+    options:  opts.map(l=>({label:l,votes:0})),
+    closed:   false,
+    deadline: deadline || null,
+    createdAt: serverTimestamp()
+  });
+  await loadPollsSnapshot(true);
+  await writeLog('Enquete criada', `${q}${deadline?' (encerra '+new Date(deadline).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})+')':''}`, 'enquetes');
+  document.getElementById('pollQuestion').value='';
+  document.getElementById('pollDeadline').value='';
+  document.querySelectorAll('.poll-opt-input').forEach(i=>i.value='');
+  showToast('✓ Enquete criada!');
+};
+
+window.closePoll = async id => {
+  if (!isMember) return;
+  await updateDoc(doc(db,'polls',id), {closed: true});
+  await loadPollsSnapshot(true);
+  await writeLog('Enquete encerrada manualmente', pollsCache.find(p=>p.id===id)?.data.question||id, 'enquetes');
+  showToast('Enquete encerrada.');
+};
+
+setInterval(() => { if (pollsCache.length) renderPolls(); }, 60000);
+
+// --- PIPELINE DE PROMOÇÃO AUTOMÁTICA ---
+async function updatePromotionCountdowns() {
+  try {
+    const now = Date.now();
+    let state = {};
+    try {
+      const stateSnap = await getDoc(promotionStateRef);
+      state = stateSnap.exists() ? (stateSnap.data() || {}) : {};
+    } catch (stateErr) {
+      console.warn('[COUNTDOWN] Não foi possível ler promotion_state, usando fallback local.', stateErr);
+    }
+    if (state.promotionPaused === true) {
+      renderPromotionBanner(0, true);
+      return;
+    }
+    const stateNextPromo = toDateOrNull(state.nextPromotionDate);
+    const nextPromoDate = stateNextPromo || getNextFriday(new Date(now + 60000));
+    const nextPromo = nextPromoDate.getTime();
+    const timeUntil = nextPromo - now;
+    
+    renderPromotionBanner(timeUntil);
+  } catch (e) {
+    console.error('[COUNTDOWN] Erro ao atualizar:', e);
+    const fallbackTimeUntil = getNextFriday(new Date(Date.now() + 60000)).getTime() - Date.now();
+    renderPromotionBanner(fallbackTimeUntil);
+  }
+}
+
+function getNextFriday(fromDate = new Date()) {
+  const date = new Date(fromDate);
+  date.setSeconds(0, 0);
+  const dayOfWeek = date.getDay();
+  let daysUntilFriday = (5 - dayOfWeek + 7) % 7;
+  const isFridayAfterCutoff = dayOfWeek === 5 && (
+    date.getHours() > 23 ||
+    (date.getHours() === 23 && date.getMinutes() >= 59)
+  );
+  if (daysUntilFriday === 0 && isFridayAfterCutoff) {
+    daysUntilFriday = 7;
+  }
+  date.setDate(date.getDate() + daysUntilFriday);
+  date.setHours(23, 59, 0, 0);
+  return date;
+}
+
+function toDateOrNull(value) {
+  if (!value) return null;
+  if (typeof value.toDate === 'function') return value.toDate();
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function renderPromotionBanner(timeUntil, paused = false) {
+  const navBadge = document.getElementById('promoCountdownNav');
+  const navBadgeMobile = document.getElementById('promoCountdownNavMobile');
+  const bannerHost = document.getElementById('promotionCountdownBanner');
+  const timeLabel = formatTimeRemaining(timeUntil);
+  const shouldShowNav = !paused && timeUntil > 0 && timeUntil < 7 * 24 * 60 * 60 * 1000;
+  const shouldShowSection = paused || timeUntil > 0;
+
+  if (navBadge) {
+    navBadge.textContent = timeLabel;
+    navBadge.style.display = shouldShowNav ? 'inline-block' : 'none';
+  }
+  if (navBadgeMobile) {
+    navBadgeMobile.textContent = timeLabel;
+    navBadgeMobile.style.display = shouldShowNav ? 'inline-block' : 'none';
+  }
+  if (!bannerHost) return;
+
+  if (!shouldShowSection) {
+    bannerHost.innerHTML = '';
+    return;
+  }
+
+  if (paused) {
+    bannerHost.innerHTML = `
+      <div class="countdown-badge-big">
+        <div style="font-size:2rem;margin-bottom:.3rem">⏸</div>
+        <div style="font-family:'Cinzel',serif;font-size:1rem;font-weight:700;letter-spacing:.08em;margin-bottom:.4rem">Inclusão de novas músicas no repertório pausada</div>
+      </div>
+    `;
+    return;
+  }
+
+  bannerHost.innerHTML = `
+    <div class="countdown-badge-big ${timeUntil < 48 * 60 * 60 * 1000 ? 'urgent' : ''}">
+      <div style="font-size:2rem;margin-bottom:.3rem">🏆</div>
+      <div style="font-family:'Cinzel',serif;font-size:1rem;font-weight:700;letter-spacing:.08em;margin-bottom:.4rem">VENCEDOR IRÁ PARA ENQUETE EM</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:2.2rem;letter-spacing:.15em;color:var(--gold)">${timeLabel}</div>
+    </div>
+  `;
+}
+
+function formatTimeRemaining(ms) {
+  if (ms <= 0) return 'Encerrando...';
+  const days = Math.floor(ms / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((ms % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
+  
+  if (days > 0) return `${days}d ${hours}h`;
+  if (hours > 0) return `${hours}h ${minutes}m`;
+  return `${minutes}m`;
+}
+
+// --- NAVIGATION UTILS ---
+window.toggleMobileMenu = () => {
+  const menu = document.getElementById('navMobileMenu');
+  const btn  = document.getElementById('navHamburger');
+  menu.classList.toggle('open');
+  btn.classList.toggle('open');
+};
+
+window.closeMobileMenu = () => {
+  document.getElementById('navMobileMenu').classList.remove('open');
+  document.getElementById('navHamburger').classList.remove('open');
+};
+
+// --- WAKEUP ON LOAD ---
+window.addEventListener('load', () => {
+  const overlay = document.getElementById('loadingOverlay');
+  if (overlay) {
+    overlay.classList.add('fade-out');
+    setTimeout(() => overlay.remove(), 500);
+  }
+});
+</script>
+</body>
+</html>
+
+
+
+

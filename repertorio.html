@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0D0805">
+<link rel="manifest" href="manifest.json">
+<link class="favicon" rel="shortcut icon" href="imagens/filopaluza_logo.png" type="image/x-icon">
+<link rel="apple-touch-icon" href="imagens/filopaluza_logo.png">
+<title>Repertório — Filópaluza</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cinzel:wght@400;700;900&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+@media(max-width:768px){
+  main[style]{padding-top:68px!important;padding-left:0!important;padding-right:0!important}
+  .repertorio-grid{grid-template-columns:1fr!important}
+  .form-row{grid-template-columns:1fr!important}
+  .form-card{padding:1rem}
+  .rep-item{display:flex!important;flex-wrap:wrap;align-items:flex-start;gap:.65rem;padding:.85rem .9rem}
+  .rep-num{flex:0 0 auto;min-width:22px}
+  .rep-info{flex:1 1 0;min-width:0}
+  .rep-actions{flex-wrap:wrap;gap:.35rem;row-gap:.35rem;width:100%;justify-content:flex-start!important;max-width:100%!important;padding-left:calc(22px + .65rem)}
+  .rep-actions .btn-icon{font-size:.65rem;padding:.28rem .5rem}
+}
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-title">Filópaluza</div>
+  <div class="loading-bar"><div class="loading-fill"></div></div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">Filópaluza</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="sugestoes.html">Sugestões</a></li>
+    <li style="position:relative"><a href="enquetes.html">Enquetes <span id="promoCountdownNav" class="badge-new" style="display:none"></span></a></li>
+        <li><a href="repertorio.html" style="color:var(--gold)">Repertório</a></li>
+        <li class="member-admin-only"><a href="logs.html" style="color:var(--amber)">⚡ Admin</a></li>
+      </ul>
+  <div class="nav-auth">
+    <span class="nav-user" id="navUser" style="display:none">🤠 Membro</span>
+    
+    <button class="btn-ghost btn-sm" id="loginBtn" onclick="openLogin()">Entrar</button>
+    <button class="btn-ghost btn-sm" id="logoutBtn" onclick="doLogout()" style="display:none">Sair</button>
+  </div>
+  <button class="nav-hamburger" id="navHamburger" onclick="toggleMobileMenu()">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="nav-mobile-menu" id="navMobileMenu">
+  <a href="index.html">Home</a>
+  <a href="sugestoes.html">Sugestões</a>
+  <a href="enquetes.html">Enquetes <span class="badge-mobile-inline" id="promoCountdownNavMobile" style="display:none"></span></a>
+    <a href="repertorio.html" style="color:var(--gold)">Repertório</a>
+    <a href="logs.html" id="adminLinkMobile" class="member-admin-only" style="color:var(--amber)">⚡ Portal Admin</a>
+    <div style="border-top:1px solid rgba(200,130,10,.1);margin-top:.5rem;padding:1rem 2rem;display:flex;flex-direction:column;gap:.8rem">
+    <span class="nav-user" id="navUserMobile" style="display:none;text-align:center">🤠 Membro</span>
+    
+    <button class="btn-ghost" id="loginBtnMobile" onclick="openLoginMobile()">Entrar</button>
+    <button class="btn-ghost" id="logoutBtnMobile" onclick="doLogout()" style="display:none">Sair</button>
+  </div>
+</div>
+
+<main style="padding-top: 80px; max-width: 1100px; margin: 0 auto; padding-left: 1rem; padding-right: 1rem;">
+  
+  <!-- 06 REPERTÓRIO -->
+  <section id="repertorio" style="padding: 4rem 1.5rem 2rem;">
+    <div class="section-header" style="position: static; margin-bottom: 2rem;">
+      <div class="section-number">01</div>
+      <div class="section-title-wrap"><h2>Repertório Atual</h2><p>Músicas que a banda já sabe tocar</p></div>
+      <div class="section-line"></div>
+    </div>
+    
+    <div class="member-only" style="margin-bottom:1.5rem">
+      <div class="form-card">
+        <div class="form-row">
+          <div class="form-group"><label>Música</label><input type="text" id="repSong" placeholder="Nome da música"></div>
+          <div class="form-group"><label>Artista</label><input type="text" id="repArtist" placeholder="Ex: Deep Purple"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Link YouTube (opcional)</label><input type="url" id="repYt" placeholder="https://youtube.com/..."></div>
+          <div class="form-group"><label>Link Cifra (opcional)</label><input type="url" id="repCifra" placeholder="https://cifraclub.com.br/..."></div>
+        </div>
+        <button class="btn" onclick="addRepSong()">Adicionar ao Repertório</button>
+        
+      </div>
+    </div>
+
+    <div class="repertorio-grid" id="repertorioGrid"></div>
+  </section>
+
+</main>
+
+<!-- LOGIN MODAL -->
+<div class="modal-overlay" id="loginModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeLogin()">✕</button>
+    <div class="modal-title">Entrar no Filópaluza</div>
+    <div class="modal-subtitle">Acesso restrito para banda e interações</div>
+    <div id="loginStep1">
+      <button class="btn-google" onclick="doGoogleLogin()">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.569 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.707A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.707V4.961H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.039l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.961L3.964 6.293C4.672 4.166 6.656 3.58 9 3.58z"/></svg>
+        Entrar com Google
+      </button>
+    </div>
+    <div class="modal-error" id="loginError">Erro ao autenticar. Tente novamente.</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- CONFIRM HELPER -->
+<script>
+window.confirmAction = (msg) => confirm(msg);
+</script>
+
+<!-- FIREBASE & CORE SCRIPT -->
+<script type="module">
+import {
+  db, auth, provider,
+  collection, doc, onSnapshot, addDoc, deleteDoc, updateDoc, setDoc, getDoc, getDocs, orderBy, query, serverTimestamp, runTransaction, Timestamp, increment,
+  signInWithPopup, signOut, onAuthStateChanged
+} from "./firebase-init.js";
+
+// --- STATE ---
+let isLoggedIn = false;
+let isMember = false;
+let repertorioLoaded = false;
+
+let repCache = [];
+
+let repertorioExpanded = false;
+
+
+
+
+let readAuditCache = { checkedAt: 0, data: null };
+const READ_AUDIT_CONFIG_ID = 'readAudit';
+
+// Settings & endpoints
+const FUNCTIONS_BASE_URL = 'https://us-central1-filopaluza.cloudfunctions.net';
+const promotionStateRef = doc(db, 'promotion_state', 'current');
+
+// --- TOAST UTILS ---
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  if (toast) {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3200);
+  }
+}
+
+// --- LOGGING ---
+async function writeLog(action, detail, category) {
+  const user = auth.currentUser;
+  try {
+    await addDoc(collection(db,'logs'), {
+      action,
+      detail,
+      category,
+      who: user?.displayName || user?.email || 'Membro',
+      whoEmail: user?.email || '',
+      ts: serverTimestamp(),
+      tsLocal: new Date().toLocaleString('pt-BR')
+    });
+  } catch (e) {
+    console.warn('Write log error:', e);
+  }
+}
+
+// --- READ AUDIT LOGGING ---
+function auditDateKey(date = new Date()) {
+  const pad = n => String(n).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())} ${pad(date.getHours())}:00`;
+}
+
+function auditTimestampMs(value) {
+  if (!value) return 0;
+  if (typeof value.toMillis === 'function') return value.toMillis();
+  if (typeof value.toDate === 'function') return value.toDate().getTime();
+  return new Date(value).getTime() || 0;
+}
+
+async function getReadAuditConfig(force = false) {
+  const now = Date.now();
+  if (!force && readAuditCache.checkedAt && now - readAuditCache.checkedAt < 60000) return readAuditCache.data;
+  const snap = await getDoc(doc(db, 'config', READ_AUDIT_CONFIG_ID));
+  const data = snap.exists() ? snap.data() : null;
+  readAuditCache = { checkedAt: now, data };
+  return data;
+}
+
+function readAuditSeverity(estimatedReads) {
+  if (estimatedReads >= 200) return 'critical';
+  if (estimatedReads >= 50) return 'warning';
+  return 'info';
+}
+
+async function auditReadEvent({ page = 'repertorio', action, collectionName, estimatedReads = 0, meta = {} }) {
+  if (!isLoggedIn || !isMember || !auth.currentUser || !action || !collectionName) return;
+  const config = await getReadAuditConfig().catch(() => null);
+  const expiresAt = auditTimestampMs(config?.expiresAt);
+  if (!config?.enabled || !config?.activeRunId || !expiresAt || expiresAt <= Date.now()) return;
+  const reads = Number(estimatedReads || 0);
+  try {
+    await addDoc(collection(db, 'read_audit_events'), {
+      auditId: config.activeRunId,
+      at: serverTimestamp(),
+      atLocal: new Date().toLocaleString('pt-BR'),
+      hourKey: auditDateKey(),
+      userEmail: auth.currentUser.email || '',
+      userName: auth.currentUser.displayName || auth.currentUser.email || 'Membro',
+      page,
+      action,
+      collection: collectionName,
+      estimatedReads: reads,
+      severity: readAuditSeverity(reads),
+      path: location.pathname,
+      userAgent: navigator.userAgent.slice(0, 180),
+      meta
+    });
+  } catch (err) {
+    console.warn('Read audit event error:', err);
+  }
+}
+
+// --- UTILITIES ---
+function normalizeSongKey(song, artist) {
+  return `${String(song || '').trim().toLowerCase()}::${String(artist || '—').trim().toLowerCase()}`;
+}
+
+function formatTs(ts) {
+  if (!ts) return '';
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  if (isNaN(d)) return '';
+  const day = String(d.getDate()).padStart(2,'0');
+  const mon = String(d.getMonth()+1).padStart(2,'0');
+  return `${day}/${mon}`;
+}
+
+function getYtId(url) {
+  if (!url) return null;
+  const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([A-Za-z0-9_-]{11})/);
+  return m ? m[1] : null;
+}
+
+function ytBtn(url) {
+  if (!url) return '';
+  const id = getYtId(url);
+  if (id) {
+    return `<a href="${url}" target="_blank" onclick="event.stopPropagation()" title="Abrir no YouTube" style="display:inline-block;flex-shrink:0;text-decoration:none">
+      <div style="position:relative;width:80px;height:45px;border-radius:2px;overflow:hidden;border:1px solid rgba(200,130,10,.3);transition:border-color .2s" onmouseover="this.style.borderColor='var(--amber)'" onmouseout="this.style.borderColor='rgba(200,130,10,.3)'">
+        <img src="https://img.youtube.com/vi/${id}/mqdefault.jpg" alt="YouTube" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block">
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.3);transition:background .2s" onmouseover="this.style.background='rgba(0,0,0,.15)'" onmouseout="this.style.background='rgba(0,0,0,.3)'">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="12" fill="rgba(255,0,0,.85)"/><polygon points="9.5,7 18,12 9.5,17" fill="white"/></svg>
+        </div>
+      </div>
+    </a>`;
+  }
+  return `<a href="${url}" target="_blank" class="btn-icon" onclick="event.stopPropagation()">▶ YouTube</a>`;
+}
+
+function cifraBtn(url) {
+  if (!url) return '';
+  return `<a href="${url}" target="_blank" class="btn-icon" onclick="event.stopPropagation()">♫ Cifra</a>`;
+}
+
+function buildMusicSearchTerm(song, artist='') {
+  return encodeURIComponent(`${song || ''} ${artist || ''}`.trim());
+}
+
+function ytSearchBtn(song, artist='') {
+  const term = buildMusicSearchTerm(song, artist);
+  return `<a href="https://www.youtube.com/results?search_query=${term}" target="_blank" class="btn-icon" onclick="event.stopPropagation()">🔎 Buscar video</a>`;
+}
+
+async function fetchFunctionJson(path, params={}) {
+  const url = new URL(`${FUNCTIONS_BASE_URL}/${path}`);
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && `${value}`.trim() !== '') url.searchParams.set(key, value);
+  });
+  const resp = await fetch(url.toString());
+  const data = await resp.json().catch(() => ({}));
+  if (!resp.ok || data.ok === false) throw new Error(data.error || 'Não foi possível concluir a busca automática.');
+  return data;
+}
+
+// --- ROLE AUTH ---
+async function isEmailApproved(email) {
+  const snap = await getDoc(doc(db, 'approved_emails', email.toLowerCase()));
+  return snap.exists();
+}
+
+// --- LOGINS ---
+window.openLogin = () => {
+  document.getElementById('loginModal').classList.add('show');
+};
+window.closeLogin = () => {
+  document.getElementById('loginModal').classList.remove('show');
+};
+window.openLoginMobile = () => {
+  closeMobileMenu();
+  openLogin();
+};
+
+window.doGoogleLogin = async () => {
+  try {
+    await signInWithPopup(auth, provider);
+    closeLogin();
+  } catch (e) {
+    if (e.code !== 'auth/popup-closed-by-user') {
+      document.getElementById('loginError').classList.add('show');
+    }
+  }
+};
+
+window.doLogout = async () => {
+  await signOut(auth);
+  showToast('Até logo!');
+};
+
+// --- AUTH LISTENER ---
+onAuthStateChanged(auth, async user => {
+  if (user) {
+    const approved = await isEmailApproved(user.email);
+    isMember = approved;
+    isLoggedIn = true;
+    const firstName = user.displayName?.split(' ')[0] || user.email?.split('@')[0] || 'Visitante';
+    document.getElementById('navUser').textContent       = `🤠 ${firstName}`;
+    document.getElementById('navUserMobile').textContent = `🤠 ${firstName}`;
+  } else {
+    isLoggedIn = false;
+    isMember   = false;
+  }
+  const isAuditAdmin = isLoggedIn && (auth.currentUser?.email || '').toLowerCase() === 'juliocereser@gmail.com';
+  document.body.classList.toggle('is-audit-admin', isAuditAdmin);
+  applyAuth();
+  loadRepertorioSnapshot(true);
+  updatePromotionCountdowns();
+});
+
+function applyAuth() {
+  document.body.classList.toggle('logged-in', isLoggedIn);
+  document.body.classList.toggle('is-member', isMember);
+  
+  document.getElementById('loginBtn').style.display  = isLoggedIn ? 'none' : '';
+  document.getElementById('logoutBtn').style.display = isLoggedIn ? '' : 'none';
+  document.getElementById('navUser').style.display   = isLoggedIn ? '' : 'none';
+  
+  
+  document.getElementById('loginBtnMobile').style.display  = isLoggedIn ? 'none' : '';
+  document.getElementById('logoutBtnMobile').style.display = isLoggedIn ? '' : 'none';
+  document.getElementById('navUserMobile').style.display   = isLoggedIn ? '' : 'none';
+  
+  // Expose member elements
+  document.querySelectorAll('.member-only').forEach(el => {
+    el.style.display = isMember ? 'block' : 'none';
+  });
+}
+
+// --- SETLIST HELPER (needed to check "no ensaio" tag) ---
+async function loadSetlist(force = false) {
+  if (setlistLoaded && !force) return;
+  const ref  = doc(db,'setlists','data');
+  const baseSnap = await getDoc(ref);
+  if (!baseSnap.exists()) {
+    setlistData = {tab0:[],tab1:[]};
+    setlistLoaded = true;
+    return;
+  }
+  setlistData = baseSnap.data() || {};
+  setlistLoaded = true;
+}
+
+function getActiveSetlistSongs() {
+  const nextSongs = Array.isArray(setlistData[NEXT_SETLIST_KEY]) ? setlistData[NEXT_SETLIST_KEY] : [];
+  const legacySongs = Array.isArray(setlistData[LEGACY_SETLIST_KEY]) ? setlistData[LEGACY_SETLIST_KEY] : [];
+  return nextSongs.length ? nextSongs : legacySongs;
+}
+
+function getSetlistVoteCounts(song) {
+  const votes = Object.values(song?.voterMap || {});
+  const likes = votes.length ? votes.filter(v => v === 'like').length : (song?.likes || 0);
+  const dislikes = votes.length ? votes.filter(v => v === 'dislike').length : (song?.dislikes || 0);
+  return { likes, dislikes, score: likes - dislikes };
+}
+
+function sortSetlistByRanking(songs) {
+  return songs
+    .map((song, index) => ({ song, index, votes: getSetlistVoteCounts(song) }))
+    .sort((a, b) => {
+      if (b.votes.score !== a.votes.score) return b.votes.score - a.votes.score;
+      if (b.votes.likes !== a.votes.likes) return b.votes.likes - a.votes.likes;
+      return a.index - b.index;
+    })
+    .map(item => item.song);
+}
+
+// --- REPERTÓRIO LOGIC ---
+async function loadRepertorioSnapshot(force = false) {
+  if (repertorioLoaded && !force) {
+    await loadSetlist();
+    renderRepFromCache();
+    return;
+  }
+  await loadSetlist(force);
+  const snap = await getDocs(query(collection(db,'repertorio'), orderBy('addedAt','asc')));
+  repCache = snap.docs.map(d=>({id:d.id,data:d.data()}));
+  repertorioLoaded = true;
+  renderRepFromCache();
+}
+
+function renderRepFromCache() {
+  const grid = document.getElementById('repertorioGrid');
+  if (!grid) return;
+  if (!repCache.length) {
+    grid.innerHTML = `<p style="color:var(--smoke);font-style:italic;grid-column:1/-1">Nenhuma música ainda.</p>`;
+    return;
+  }
+  
+  const totalSongs = repCache.length;
+  const displaySongs = repertorioExpanded ? repCache : repCache.slice(0, 5);
+  const setlistKeys = new Set(getActiveSetlistSongs().map(s => normalizeSongKey(s.song, s.artist)));
+  
+  const items = displaySongs.map(({id, data: r}, i) => {
+    const isInSetlist = setlistKeys.has(normalizeSongKey(r.song, r.artist));
+    const setlistTag = isInSetlist ? '<span class="rep-setlist-tag">No ensaio</span>' : '';
+    const sendToSetlistBtn = isMember ? `<button class="btn-icon" onclick="addRepToSetlist('${id}');event.stopPropagation()">➕ Ensaio</button>` : '';
+    const editBtn = isMember ? `<button class="btn-icon" onclick="openRepEdit('${id}');event.stopPropagation()">✎ Editar</button>` : '';
+    const rmBtn   = isMember ? `<button class="setlist-remove" onclick="removeRepSong('${id}')">✕</button>` : '';
+    return `<div class="rep-item${isInSetlist ? ' in-setlist' : ''}">
+      <span class="rep-num">${i+1}</span>
+      <div class="rep-info">
+        <div class="rep-song">${r.song}${setlistTag}</div>
+        <div class="rep-artist">${r.artist}</div>
+      </div>
+      <div class="rep-actions">
+        ${r.youtube ? ytBtn(r.youtube) : `<button class="btn-icon" onclick="findRepYoutube('${id}');event.stopPropagation()">⚡ Auto vídeo</button>${ytSearchBtn(r.song, r.artist)}`}
+        ${r.cifra ? cifraBtn(r.cifra) : `<button class="btn-icon" onclick="chooseRepCifra('${id}');event.stopPropagation()">♫ Auto cifra</button>`}
+        ${sendToSetlistBtn}
+        ${editBtn}
+        ${rmBtn}
+      </div>
+    </div>`;
+  }).join('');
+  
+  const toggleBtn = totalSongs > 5 ? `
+    <div style="text-align:center;padding:1rem;grid-column:1/-1">
+      <button class="btn-ghost btn-sm" onclick="toggleRepertorioExpand()">
+        ${repertorioExpanded ? '▲ Ver menos' : `▼ Ver mais (${totalSongs - 5} ${totalSongs - 5 === 1 ? 'música' : 'músicas'})`}
+      </button>
+    </div>` : '';
+  
+  grid.innerHTML = items + toggleBtn;
+}
+
+window.toggleRepertorioExpand = () => {
+  repertorioExpanded = !repertorioExpanded;
+  renderRepFromCache();
+};
+
+window.addRepSong = async () => {
+  if (!isMember) { showToast('⚠ Acesso restrito a membros'); return; }
+  const song   = document.getElementById('repSong').value.trim();
+  const artist = document.getElementById('repArtist').value.trim();
+  const youtube= document.getElementById('repYt').value.trim();
+  const cifra  = document.getElementById('repCifra').value.trim();
+  if (!song||!artist) { showToast('⚠ Preencha música e artista'); return; }
+  await addDoc(collection(db,'repertorio'),{song,artist,youtube,cifra,addedAt:serverTimestamp(),by:auth.currentUser?.displayName||'Membro'});
+  await loadRepertorioSnapshot(true);
+  await writeLog('Música adicionada ao repertório', `${song} — ${artist}`, 'repertorio');
+  ['repSong','repArtist','repYt','repCifra'].forEach(id=>document.getElementById(id).value='');
+  showToast(`✓ "${song}" adicionada ao repertório!`);
+};
+
+window.addRepToSetlist = async id => {
+  if (!isMember) { showToast('⚠ Acesso restrito a membros'); return; }
+  const item = repCache.find(entry => entry.id === id);
+  if (!item) { showToast('⚠ Música não encontrada no repertório'); return; }
+
+  await loadSetlist();
+  const r = item.data || {};
+  const song = String(r.song || '').trim();
+  const artist = String(r.artist || '—').trim() || '—';
+  if (!song) { showToast('⚠ Música sem título'); return; }
+
+  const arr = [...(setlistData[NEXT_SETLIST_KEY] || [])];
+  const normalizedSong = song.toLowerCase();
+  const normalizedArtist = artist.toLowerCase();
+  const alreadyAdded = arr.some(s => {
+    const setSong = String(s.song || '').trim().toLowerCase();
+    const setArtist = String(s.artist || '—').trim().toLowerCase();
+    return setSong === normalizedSong && setArtist === normalizedArtist;
+  });
+  if (alreadyAdded) { showToast('✓ Essa música já está no ensaio atual'); return; }
+
+  const nextSong = {
+    song,
+    artist,
+    youtube: r.youtube || '',
+    cifra: r.cifra || ''
+  };
+  arr.push(nextSong);
+  const ranked = sortSetlistByRanking(arr);
+  setlistData = { ...setlistData, [NEXT_SETLIST_KEY]: ranked };
+  await updateDoc(doc(db,'setlists','data'), { [NEXT_SETLIST_KEY]: ranked });
+  setlistLoaded = true;
+  renderRepFromCache();
+  showToast(`✓ "${song}" foi para o ensaio atual!`);
+  await writeLog('Música do repertório enviada ao ensaio', `${song} — ${artist}`, 'setlist');
+};
+
+window.openRepEdit = async id => {
+  if (!isMember) return;
+  const snap = await getDoc(doc(db,'repertorio',id));
+  if (!snap.exists()) return;
+  const r = snap.data();
+
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9200;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;padding:1rem';
+  overlay.innerHTML = `
+    <div style="background:linear-gradient(160deg,#1a1207,#0f0b04);border:1px solid rgba(200,130,10,.3);border-radius:2px;padding:1.6rem;max-width:480px;width:100%">
+      <p style="font-family:'Cinzel',serif;color:var(--gold);font-size:.9rem;margin-bottom:1.1rem;letter-spacing:.08em;text-transform:uppercase">Editar Música</p>
+      <div style="display:flex;flex-direction:column;gap:.7rem">
+        <div><label style="font-size:.7rem;color:var(--smoke);letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:.25rem">Música</label>
+          <input id="repEditSong" value="${r.song||''}" style="width:100%;padding:.4rem .6rem;background:rgba(10,8,4,.7);border:1px solid rgba(200,130,10,.25);color:var(--cream);border-radius:1px;font-family:inherit;font-size:.85rem"></div>
+        <div><label style="font-size:.7rem;color:var(--smoke);letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:.25rem">Artista</label>
+          <input id="repEditArtist" value="${r.artist||''}" style="width:100%;padding:.4rem .6rem;background:rgba(10,8,4,.7);border:1px solid rgba(200,130,10,.25);color:var(--cream);border-radius:1px;font-family:inherit;font-size:.85rem"></div>
+        <div style="display:flex;gap:.6rem">
+          <div style="flex:1"><label style="font-size:.7rem;color:var(--smoke);letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:.25rem">Link YouTube</label>
+            <input id="repEditYt" value="${r.youtube||''}" type="url" placeholder="https://youtube.com/..." style="width:100%;padding:.4rem .6rem;background:rgba(10,8,4,.7);border:1px solid rgba(200,130,10,.25);color:var(--cream);border-radius:1px;font-family:inherit;font-size:.82rem">
+            ${r.youtube ? `<div style="margin-top:.35rem">${ytBtn(r.youtube)}</div>` : ''}
+          </div>
+          <div style="flex:1"><label style="font-size:.7rem;color:var(--smoke);letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:.25rem">Link Cifra</label>
+            <input id="repEditCifra" value="${r.cifra||''}" type="url" placeholder="https://cifraclub.com.br/..." style="width:100%;padding:.4rem .6rem;background:rgba(10,8,4,.7);border:1px solid rgba(200,130,10,.25);color:var(--cream);border-radius:1px;font-family:inherit;font-size:.82rem">
+            ${r.cifra ? `<div style="margin-top:.35rem">${cifraBtn(r.cifra)}</div>` : ''}
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:.7rem;justify-content:flex-end;margin-top:1.2rem">
+        <button class="btn-ghost btn-sm" onclick="this.closest('[style*=fixed]').remove()">Cancelar</button>
+        <button class="btn btn-sm" onclick="saveRepEdit('${id}',this)">💾 Salvar</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+};
+
+window.saveRepEdit = async (id, btn) => {
+  const overlay = btn.closest('[style*=fixed]');
+  const song    = overlay.querySelector('#repEditSong').value.trim();
+  const artist  = overlay.querySelector('#repEditArtist').value.trim();
+  const youtube = overlay.querySelector('#repEditYt').value.trim();
+  const cifra   = overlay.querySelector('#repEditCifra').value.trim();
+  if (!song||!artist) { showToast('⚠ Preencha música e artista'); return; }
+  await updateDoc(doc(db,'repertorio',id), {song, artist, youtube, cifra});
+  await loadRepertorioSnapshot(true);
+  await writeLog('Música do repertório editada', `${song} — ${artist}`, 'repertorio');
+  overlay.remove();
+  showToast(`✓ "${song}" atualizada!`);
+};
+
+window.removeRepSong = async id => {
+  if (!confirmAction('Deseja realmente remover esta música do repertório?')) return;
+  const snap = await getDoc(doc(db,'repertorio',id));
+  const r = snap.exists() ? snap.data() : {};
+  await deleteDoc(doc(db,'repertorio',id));
+  await loadRepertorioSnapshot(true);
+  await writeLog('Música removida do repertório', `${r.song||id} — ${r.artist||''}`, 'repertorio');
+  showToast('Música removida.');
+};
+
+window.importSetlistToRep = async () => {
+  if (!isMember) return;
+  const songs = getActiveSetlistSongs();
+  if (!songs.length) { showToast('⚠ Nenhuma música no setlist atual'); return; }
+  const existing = repCache.map(({data:r}) => r.song.toLowerCase().trim());
+  const toAdd    = songs.filter(s => !existing.includes(s.song.toLowerCase().trim()));
+  if (!toAdd.length) { showToast('✓ Todas as músicas do setlist já estão no repertório'); return; }
+  const userName = auth.currentUser?.displayName||'Membro';
+  for (const s of toAdd) {
+    await addDoc(collection(db,'repertorio'), {
+      song: s.song, artist: s.artist||'—',
+      youtube: s.youtube||'', cifra: s.cifra||'',
+      addedAt: serverTimestamp(), by: userName
+    });
+  }
+  await loadRepertorioSnapshot(true);
+  await writeLog('Músicas importadas do setlist', `${toAdd.length} música${toAdd.length!==1?'s':''}`, 'repertorio');
+  showToast(`✓ ${toAdd.length} música${toAdd.length!==1?'s':''} importada${toAdd.length!==1?'s':''} para o repertório!`);
+};
+
+// Auto links lookup
+window.findRepYoutube = async id => {
+  try {
+    const ref = doc(db, 'repertorio', id);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) return;
+    const r = snap.data();
+    if (r.youtube) {
+      showToast('Esta música já possui vídeo.');
+      return;
+    }
+    showToast('⏳ Buscando vídeo automaticamente...');
+    const data = await fetchFunctionJson('lookup_youtube_link', { song: r.song || '', artist: r.artist || '' });
+    await updateDoc(ref, { youtube: data.url });
+    await writeLog('Link de vídeo localizado', `${r.song} — ${r.artist}`, 'repertorio');
+    await loadRepertorioSnapshot(true);
+    showToast('✓ Vídeo encontrado e salvo!');
+  } catch (err) {
+    console.error('Auto rep youtube error:', err);
+    showToast(`⚠ ${err.message || 'Não foi possível localizar o vídeo.'}`);
+  }
+};
+
+window.chooseRepCifra = async id => {
+  try {
+    const ref = doc(db, 'repertorio', id);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) return;
+    const r = snap.data();
+    showToast('⏳ Buscando cifra automaticamente...');
+    const data = await fetchFunctionJson('lookup_cifra_candidates', { song: r.song || '', artist: r.artist || '' });
+    const candidates = Array.isArray(data.candidates) ? data.candidates : [];
+    if (!candidates.length) {
+      showToast('⚠ Nenhuma opção de cifra encontrada.');
+      return;
+    }
+    await updateDoc(ref, { cifra: candidates[0].url });
+    await writeLog('Link de cifra localizado', `${r.song} — ${r.artist}`, 'repertorio');
+    await loadRepertorioSnapshot(true);
+    showToast('✓ Primeira cifra encontrada foi salva!');
+  } catch (err) {
+    console.error('Auto rep cifra error:', err);
+    showToast(`⚠ ${err.message || 'Não foi possível buscar a cifra.'}`);
+  }
+};
+
+// --- PROMOTION COUNTDOWNS ---
+async function updatePromotionCountdowns() {
+  try {
+    const now = Date.now();
+    let state = {};
+    try {
+      const stateSnap = await getDoc(promotionStateRef);
+      state = stateSnap.exists() ? (stateSnap.data() || {}) : {};
+    } catch (stateErr) {
+      console.warn('[COUNTDOWN] Não foi possível ler promotion_state, usando fallback local.', stateErr);
+    }
+    if (state.promotionPaused === true) {
+      renderPromotionNav(0, true);
+      return;
+    }
+    const stateNextPromo = toDateOrNull(state.nextPromotionDate);
+    const nextPromoDate = stateNextPromo || getNextFriday(new Date(now + 60000));
+    const nextPromo = nextPromoDate.getTime();
+    const timeUntil = nextPromo - now;
+    
+    renderPromotionNav(timeUntil);
+  } catch (e) {
+    console.error('[COUNTDOWN] Erro ao atualizar:', e);
+  }
+}
+
+function getNextFriday(fromDate = new Date()) {
+  const date = new Date(fromDate);
+  date.setSeconds(0, 0);
+  const dayOfWeek = date.getDay();
+  let daysUntilFriday = (5 - dayOfWeek + 7) % 7;
+  const isFridayAfterCutoff = dayOfWeek === 5 && (
+    date.getHours() > 23 ||
+    (date.getHours() === 23 && date.getMinutes() >= 59)
+  );
+  if (daysUntilFriday === 0 && isFridayAfterCutoff) {
+    daysUntilFriday = 7;
+  }
+  date.setDate(date.getDate() + daysUntilFriday);
+  date.setHours(23, 59, 0, 0);
+  return date;
+}
+
+function toDateOrNull(value) {
+  if (!value) return null;
+  if (typeof value.toDate === 'function') return value.toDate();
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function renderPromotionNav(timeUntil, paused = false) {
+  const navBadge = document.getElementById('promoCountdownNav');
+  const navBadgeMobile = document.getElementById('promoCountdownNavMobile');
+  const timeLabel = formatTimeRemaining(timeUntil);
+  const shouldShowNav = !paused && timeUntil > 0 && timeUntil < 7 * 24 * 60 * 60 * 1000;
+
+  if (navBadge) {
+    navBadge.textContent = timeLabel;
+    navBadge.style.display = shouldShowNav ? 'inline-block' : 'none';
+  }
+  if (navBadgeMobile) {
+    navBadgeMobile.textContent = timeLabel;
+    navBadgeMobile.style.display = shouldShowNav ? 'inline-block' : 'none';
+  }
+}
+
+function formatTimeRemaining(ms) {
+  if (ms <= 0) return 'Encerrando...';
+  const days = Math.floor(ms / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((ms % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
+  
+  if (days > 0) return `${days}d ${hours}h`;
+  if (hours > 0) return `${hours}h ${minutes}m`;
+  return `${minutes}m`;
+}
+
+// --- NAVIGATION MOBILE ---
+window.toggleMobileMenu = () => {
+  const menu = document.getElementById('navMobileMenu');
+  const btn  = document.getElementById('navHamburger');
+  menu.classList.toggle('open');
+  btn.classList.toggle('open');
+};
+
+window.closeMobileMenu = () => {
+  document.getElementById('navMobileMenu').classList.remove('open');
+  document.getElementById('navHamburger').classList.remove('open');
+};
+
+// --- FOCUS LISTENER ---
+window.addEventListener('focus', () => {
+  loadRepertorioSnapshot(true);
+});
+
+// --- WAKEUP ON LOAD ---
+window.addEventListener('load', () => {
+  const overlay = document.getElementById('loadingOverlay');
+  if (overlay) {
+    overlay.classList.add('fade-out');
+    setTimeout(() => overlay.remove(), 500);
+  }
+});
+</script>
+</body>
+</html>
+
+
+
+
