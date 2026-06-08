@@ -182,7 +182,7 @@ nav {
   margin:.5rem 0 .75rem; animation:fadeUp 1.2s .1s ease both;
 }
 .hero-logo-img {
-  width:260px; max-width:65vw; height:auto; object-fit:contain;
+  width:380px; max-width:80vw; height:auto; object-fit:contain;
   filter:drop-shadow(0 0 24px rgba(200,112,26,.35));
 }
 @keyframes fadeUp{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
