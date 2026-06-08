@@ -2,7 +2,7 @@
   "name": "Filópaluza",
   "short_name": "Filópaluza",
   "description": "O barzinho dos amigos",
-  "start_url": "/index.html",
+  "start_url": ".",
   "display": "standalone",
   "background_color": "#0D0805",
   "theme_color": "#C8701A",

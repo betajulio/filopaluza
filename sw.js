@@ -1,9 +1,9 @@
-const CACHE_NAME = 'filopaluza-v1';
+const CACHE_NAME = 'filopaluza-v2';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/style.css',
-  '/manifest.json'
+  './',
+  './index.html',
+  './style.css',
+  './manifest.json'
 ];
 
 self.addEventListener('install', event => {
