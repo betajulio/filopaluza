@@ -4,16 +4,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Bebas+Neue&family=Nunito:wght@400;600;700&family=IM+Fell+English+SC&display=swap');
 
 :root {
-  --black:  #0D0805;
-  --dark:   #160D07;
-  --brown:  #2A1508;
-  --amber:  #C8701A;
-  --gold:   #E8A820;
-  --cream:  #F0E4C8;
-  --wine:   #7B1D37;
-  --rust:   #9A3018;
-  --paper:  #D4C0A0;
-  --smoke:  #7A6050;
+  --black:  #20110B; /* Dark wood */
+  --dark:   #3A2318; /* Warm rustic wood */
+  --brown:  #5C3A21; /* Medium wood */
+  --amber:  #F59E0B; /* Beer / Acoustic guitar */
+  --gold:   #FBBF24; /* String lights / Gold */
+  --cream:  #FEF3C7; /* Soft cream text */
+  --wine:   #B45309; /* Warm copper */
+  --rust:   #D97706; /* Vibrant orange/amber */
+  --paper:  #FDE68A; /* Warm highlight */
+  --smoke:  #A39184; /* Soft brown/grey for secondary text */
 }
 
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box }
