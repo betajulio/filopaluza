@@ -90,7 +90,12 @@
     <div class="hero-tag">Sertanejo · Barzinho · Amizade</div>
     <h1 class="hero-title">Filópaluza</h1>
     <div class="hero-divider"><div class="hero-diamond"></div></div>
+    
     <p class="hero-subtitle">O barzinho dos amigos</p>
+
+    <button id="btnInstallPwa" class="btn" style="display:none; margin: 1.5rem auto 0; align-items:center; justify-content:center; gap:0.5rem; animation: fadeUp 1.2s 0.2s ease both;">
+      <span style="font-size:1.2rem;">📱</span> Instalar Aplicativo
+    </button>
   </div>
   <div class="scroll-hint">
     <span>Descer</span>
@@ -630,5 +635,50 @@ window.addEventListener('load', () => {
   if (overlay) { overlay.classList.add('fade-out'); setTimeout(() => overlay.remove(), 500); }
 });
 </script>
+<!-- PWA / Service Worker -->
+<script>
+  // Register Service Worker
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').then(reg => {
+        console.log('SW registered!', reg);
+      }).catch(err => console.log('SW registration failed', err));
+    });
+  }
+
+  // Handle Install Prompt
+  let deferredPrompt;
+  const btnInstallPwa = document.getElementById('btnInstallPwa');
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    // Prevent Chrome 67 and earlier from automatically showing the prompt
+    e.preventDefault();
+    // Stash the event so it can be triggered later.
+    deferredPrompt = e;
+    // Update UI notify the user they can add to home screen
+    btnInstallPwa.style.display = 'flex';
+  });
+
+  btnInstallPwa.addEventListener('click', async () => {
+    if (deferredPrompt) {
+      // Show the prompt
+      deferredPrompt.prompt();
+      // Wait for the user to respond to the prompt
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        btnInstallPwa.style.display = 'none';
+      }
+      deferredPrompt = null;
+    }
+  });
+
+  window.addEventListener('appinstalled', () => {
+    // Hide the app-provided install promotion
+    btnInstallPwa.style.display = 'none';
+    deferredPrompt = null;
+    console.log('PWA was installed');
+  });
+</script>
+
 </body>
 </html>

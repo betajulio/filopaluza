@@ -2,20 +2,22 @@
   "name": "Filópaluza",
   "short_name": "Filópaluza",
   "description": "O barzinho dos amigos",
-  "start_url": "/",
+  "start_url": "/index.html",
   "display": "standalone",
   "background_color": "#0D0805",
   "theme_color": "#C8701A",
   "icons": [
     {
-      "src": "imagens/filopaluza_logo.png",
+      "src": "imagens/app_icon_192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
-      "src": "imagens/filopaluza_logo.png",
+      "src": "imagens/app_icon_512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
