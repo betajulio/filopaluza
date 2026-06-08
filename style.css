@@ -327,7 +327,7 @@ textarea{resize:vertical;min-height:90px}
 .poll-my-vote{font-size:.75rem;color:var(--amber);font-style:italic}
 
 /* ── REPERTÓRIO ──────────────────────────────────── */
-.repertorio-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem}
+.repertorio-grid{display:grid;grid-template-columns:1fr;gap:.8rem}
 .rep-item{background:rgba(42,21,8,.5);border:1px solid rgba(200,112,26,.15);border-radius:2px;padding:.8rem 1.1rem;display:flex;align-items:center;gap:.8rem;transition:border-color .2s}
 .rep-item:hover{border-color:rgba(200,112,26,.35)}
 .rep-num{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:rgba(200,112,26,.3);min-width:28px}
