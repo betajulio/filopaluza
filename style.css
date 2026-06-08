@@ -19,10 +19,12 @@
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box }
 
 body {
-  background: var(--black);
+  background: radial-gradient(circle at top, #3A2318 0%, var(--black) 100%);
+  background-attachment: fixed;
   color: var(--cream);
   font-family: 'Nunito', sans-serif;
   overflow-x: hidden;
+  scroll-behavior: smooth;
 }
 
 /* Warm noise texture overlay */
@@ -56,6 +58,7 @@ nav {
   position: fixed; top:0; left:0; right:0; z-index:1000;
   background: linear-gradient(180deg, rgba(13,8,5,.98), rgba(13,8,5,.85));
   border-bottom: 1px solid rgba(200,112,26,.35);
+  box-shadow: 0 4px 30px rgba(0,0,0,0.5);
   padding: 0 2rem;
   display: flex; align-items:center; justify-content:space-between;
   height: 60px;
@@ -163,8 +166,8 @@ nav {
 .hero-bg {
   position:absolute; inset:0;
   background:
-    radial-gradient(ellipse 70% 55% at 50% 55%, rgba(200,112,26,.11) 0%, transparent 70%),
-    radial-gradient(ellipse 45% 40% at 20% 75%, rgba(123,29,55,.14) 0%, transparent 60%);
+    radial-gradient(ellipse 70% 55% at 50% 55%, rgba(200,112,26,.15) 0%, transparent 70%),
+    radial-gradient(ellipse 45% 40% at 20% 75%, rgba(123,29,55,.18) 0%, transparent 60%);
 }
 .hero-lines {
   position:absolute; inset:0;
@@ -236,13 +239,14 @@ section[id]{scroll-margin-top:88px}
 /* ── MEMBERS ─────────────────────────────────────── */
 .members-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1.5rem}
 .member-card {
-  background:linear-gradient(135deg,rgba(42,21,8,.8),rgba(22,13,7,.9));
-  border:1px solid rgba(200,112,26,.2); border-radius:4px;
+  background:linear-gradient(135deg,rgba(58,27,13,.8),rgba(32,17,11,.9));
+  border:1px solid rgba(200,112,26,.2); border-radius:8px;
   padding:1.5rem 1.2rem; text-align:center;
-  transition:border-color .3s,transform .3s; position:relative; overflow:hidden;
+  transition:border-color .3s,transform .3s,box-shadow .3s; position:relative; overflow:hidden;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.4);
 }
 .member-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--amber),transparent);opacity:0;transition:opacity .3s}
-.member-card:hover{border-color:rgba(200,112,26,.5);transform:translateY(-3px)}
+.member-card:hover{border-color:rgba(200,112,26,.5);transform:translateY(-5px);box-shadow: 0 15px 40px rgba(0,0,0,0.6), 0 0 15px rgba(200,112,26,.15);}
 .member-card:hover::before{opacity:1}
 body.is-member .member-card{cursor:pointer}
 .member-edit-hint{position:absolute;bottom:0;left:0;right:0;background:rgba(200,112,26,.12);color:var(--amber);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;padding:.35rem;display:none;font-family:'Playfair Display',serif}
@@ -291,8 +295,8 @@ select option{background:var(--dark)}
 textarea{resize:vertical;min-height:90px}
 
 /* ── BUTTONS ─────────────────────────────────────── */
-.btn{background:linear-gradient(135deg,var(--amber),var(--rust));color:var(--black);border:none;padding:.75rem 2rem;font-family:'Playfair Display',serif;font-size:.8rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:opacity .2s,transform .2s}
-.btn:hover{opacity:.88;transform:translateY(-1px)}
+.btn{background:linear-gradient(135deg,var(--amber),var(--rust));color:var(--black);border:none;padding:.75rem 2rem;font-family:'Playfair Display',serif;font-size:.8rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;border-radius:4px;transition:all .3s;box-shadow:0 4px 15px rgba(245,158,11,.3)}
+.btn:hover{opacity:.9;transform:translateY(-2px);box-shadow:0 6px 20px rgba(245,158,11,.5)}
 .btn-ghost{background:transparent;border:1px solid rgba(200,112,26,.4);color:var(--amber);padding:.5rem 1.2rem;font-family:'Playfair Display',serif;font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:all .2s}
 .btn-ghost:hover{background:rgba(200,112,26,.1);border-color:var(--amber)}
 .btn-sm{padding:.45rem 1rem;font-size:.72rem}
@@ -300,7 +304,7 @@ textarea{resize:vertical;min-height:90px}
 .btn-icon:hover{background:rgba(200,112,26,.22)}
 
 /* ── POLLS ───────────────────────────────────────── */
-.poll-card{background:linear-gradient(135deg,rgba(42,21,8,.6),rgba(22,13,7,.8));border:1px solid rgba(200,112,26,.2);border-radius:4px;padding:1.5rem;margin-bottom:1.2rem}
+.poll-card{background:linear-gradient(135deg,rgba(58,27,13,.7),rgba(32,17,11,.9));border:1px solid rgba(200,112,26,.2);border-radius:8px;padding:1.5rem;margin-bottom:1.2rem;box-shadow:0 8px 30px rgba(0,0,0,.4)}
 .poll-question{font-family:'Playfair Display',serif;font-size:1rem;color:var(--cream);margin-bottom:1rem}
 .poll-options{display:flex;flex-direction:column;gap:.6rem}
 .poll-option input[type="radio"]{display:none}
@@ -328,8 +332,8 @@ textarea{resize:vertical;min-height:90px}
 
 /* ── REPERTÓRIO ──────────────────────────────────── */
 .repertorio-grid{display:grid;grid-template-columns:1fr;gap:.8rem}
-.rep-item{background:rgba(42,21,8,.5);border:1px solid rgba(200,112,26,.15);border-radius:2px;padding:.8rem 1.1rem;display:flex;align-items:center;gap:.8rem;transition:border-color .2s}
-.rep-item:hover{border-color:rgba(200,112,26,.35)}
+.rep-item{background:linear-gradient(90deg,rgba(42,21,8,.5),rgba(32,17,11,.7));border:1px solid rgba(200,112,26,.15);border-radius:6px;padding:.8rem 1.1rem;display:flex;align-items:center;gap:.8rem;transition:all .3s;box-shadow:0 4px 15px rgba(0,0,0,.3)}
+.rep-item:hover{border-color:rgba(200,112,26,.4);transform:translateX(4px);box-shadow:0 6px 20px rgba(0,0,0,.5),-4px 0 0 var(--amber)}
 .rep-num{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:rgba(200,112,26,.3);min-width:28px}
 .rep-info{flex:1}
 .rep-song{color:var(--cream);font-size:.9rem}
@@ -345,8 +349,8 @@ textarea{resize:vertical;min-height:90px}
 .suggestions-list.scroll-limited::-webkit-scrollbar{width:8px}
 .suggestions-list.scroll-limited::-webkit-scrollbar-track{background:rgba(13,8,5,.28);border-radius:999px}
 .suggestions-list.scroll-limited::-webkit-scrollbar-thumb{background:rgba(200,112,26,.45);border-radius:999px}
-.suggestion-item{display:flex;align-items:center;gap:.8rem;padding:.8rem 1.2rem;background:rgba(42,21,8,.5);border:1px solid rgba(200,112,26,.15);border-radius:2px;transition:all .2s;font-size:.88rem;flex-wrap:wrap;position:relative}
-.suggestion-item:hover{border-color:rgba(200,112,26,.35)}
+.suggestion-item{display:flex;align-items:center;gap:.8rem;padding:.8rem 1.2rem;background:rgba(42,21,8,.5);border:1px solid rgba(200,112,26,.15);border-radius:6px;transition:all .3s;font-size:.88rem;flex-wrap:wrap;position:relative;box-shadow:0 4px 15px rgba(0,0,0,.3)}
+.suggestion-item:hover{border-color:rgba(200,112,26,.35);transform:translateX(4px);box-shadow:0 6px 20px rgba(0,0,0,.5),-4px 0 0 var(--rust)}
 .suggestion-item.rank-1{border-color:rgba(255,200,0,.4);background:rgba(255,200,0,.04)}
 .suggestion-item.rank-2{border-color:rgba(192,192,192,.35);background:rgba(192,192,192,.03)}
 .suggestion-item.rank-3{border-color:rgba(180,100,20,.4);background:rgba(180,100,20,.04)}
@@ -442,9 +446,9 @@ body.is-member .member-admin-only-flex{display:flex}
 
 /* ── QUICK ACCESS CARDS ──────────────────────────── */
 .quick-access-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.5rem;margin-top:2rem}
-.quick-card{background:linear-gradient(135deg,rgba(42,21,8,.7),rgba(22,13,7,.9));border:1px solid rgba(200,112,26,.2);border-radius:8px;padding:2rem 1.8rem;text-decoration:none;color:var(--cream);transition:all .3s;position:relative;overflow:hidden;display:block}
+.quick-card{background:linear-gradient(135deg,rgba(58,27,13,.8),rgba(32,17,11,.9));border:1px solid rgba(200,112,26,.2);border-radius:10px;padding:2rem 1.8rem;text-decoration:none;color:var(--cream);transition:all .3s;position:relative;overflow:hidden;display:block;box-shadow:0 10px 30px rgba(0,0,0,.5)}
 .quick-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(200,112,26,.08),transparent);opacity:0;transition:opacity .3s}
-.quick-card:hover{border-color:rgba(200,112,26,.5);transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,.25)}
+.quick-card:hover{border-color:rgba(200,112,26,.5);transform:translateY(-6px);box-shadow:0 16px 40px rgba(0,0,0,.6),0 0 20px rgba(200,112,26,.2)}
 .quick-card:hover::before{opacity:1}
 .quick-card-icon{font-size:2.4rem;margin-bottom:1rem;display:block}
 .quick-card-title{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;color:var(--gold);margin-bottom:.5rem}
