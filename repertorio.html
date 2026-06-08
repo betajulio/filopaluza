@@ -365,52 +365,14 @@ function applyAuth() {
   });
 }
 
-// --- SETLIST HELPER (needed to check "no ensaio" tag) ---
-async function loadSetlist(force = false) {
-  if (setlistLoaded && !force) return;
-  const ref  = doc(db,'setlists','data');
-  const baseSnap = await getDoc(ref);
-  if (!baseSnap.exists()) {
-    setlistData = {tab0:[],tab1:[]};
-    setlistLoaded = true;
-    return;
-  }
-  setlistData = baseSnap.data() || {};
-  setlistLoaded = true;
-}
-
-function getActiveSetlistSongs() {
-  const nextSongs = Array.isArray(setlistData[NEXT_SETLIST_KEY]) ? setlistData[NEXT_SETLIST_KEY] : [];
-  const legacySongs = Array.isArray(setlistData[LEGACY_SETLIST_KEY]) ? setlistData[LEGACY_SETLIST_KEY] : [];
-  return nextSongs.length ? nextSongs : legacySongs;
-}
-
-function getSetlistVoteCounts(song) {
-  const votes = Object.values(song?.voterMap || {});
-  const likes = votes.length ? votes.filter(v => v === 'like').length : (song?.likes || 0);
-  const dislikes = votes.length ? votes.filter(v => v === 'dislike').length : (song?.dislikes || 0);
-  return { likes, dislikes, score: likes - dislikes };
-}
-
-function sortSetlistByRanking(songs) {
-  return songs
-    .map((song, index) => ({ song, index, votes: getSetlistVoteCounts(song) }))
-    .sort((a, b) => {
-      if (b.votes.score !== a.votes.score) return b.votes.score - a.votes.score;
-      if (b.votes.likes !== a.votes.likes) return b.votes.likes - a.votes.likes;
-      return a.index - b.index;
-    })
-    .map(item => item.song);
-}
+// --- REPERTÓRIO LOGIC ---
 
 // --- REPERTÓRIO LOGIC ---
 async function loadRepertorioSnapshot(force = false) {
   if (repertorioLoaded && !force) {
-    await loadSetlist();
     renderRepFromCache();
     return;
   }
-  await loadSetlist(force);
   const snap = await getDocs(query(collection(db,'repertorio'), orderBy('addedAt','asc')));
   repCache = snap.docs.map(d=>({id:d.id,data:d.data()}));
   repertorioLoaded = true;
@@ -427,24 +389,19 @@ function renderRepFromCache() {
   
   const totalSongs = repCache.length;
   const displaySongs = repertorioExpanded ? repCache : repCache.slice(0, 5);
-  const setlistKeys = new Set(getActiveSetlistSongs().map(s => normalizeSongKey(s.song, s.artist)));
   
   const items = displaySongs.map(({id, data: r}, i) => {
-    const isInSetlist = setlistKeys.has(normalizeSongKey(r.song, r.artist));
-    const setlistTag = isInSetlist ? '<span class="rep-setlist-tag">No ensaio</span>' : '';
-    const sendToSetlistBtn = isMember ? `<button class="btn-icon" onclick="addRepToSetlist('${id}');event.stopPropagation()">➕ Ensaio</button>` : '';
     const editBtn = isMember ? `<button class="btn-icon" onclick="openRepEdit('${id}');event.stopPropagation()">✎ Editar</button>` : '';
     const rmBtn   = isMember ? `<button class="setlist-remove" onclick="removeRepSong('${id}')">✕</button>` : '';
-    return `<div class="rep-item${isInSetlist ? ' in-setlist' : ''}">
+    return `<div class="rep-item">
       <span class="rep-num">${i+1}</span>
       <div class="rep-info">
-        <div class="rep-song">${r.song}${setlistTag}</div>
+        <div class="rep-song">${r.song}</div>
         <div class="rep-artist">${r.artist}</div>
       </div>
       <div class="rep-actions">
         ${r.youtube ? ytBtn(r.youtube) : `<button class="btn-icon" onclick="findRepYoutube('${id}');event.stopPropagation()">⚡ Auto vídeo</button>${ytSearchBtn(r.song, r.artist)}`}
         ${r.cifra ? cifraBtn(r.cifra) : `<button class="btn-icon" onclick="chooseRepCifra('${id}');event.stopPropagation()">♫ Auto cifra</button>`}
-        ${sendToSetlistBtn}
         ${editBtn}
         ${rmBtn}
       </div>
@@ -480,42 +437,7 @@ window.addRepSong = async () => {
   showToast(`✓ "${song}" adicionada ao repertório!`);
 };
 
-window.addRepToSetlist = async id => {
-  if (!isMember) { showToast('⚠ Acesso restrito a membros'); return; }
-  const item = repCache.find(entry => entry.id === id);
-  if (!item) { showToast('⚠ Música não encontrada no repertório'); return; }
-
-  await loadSetlist();
-  const r = item.data || {};
-  const song = String(r.song || '').trim();
-  const artist = String(r.artist || '—').trim() || '—';
-  if (!song) { showToast('⚠ Música sem título'); return; }
-
-  const arr = [...(setlistData[NEXT_SETLIST_KEY] || [])];
-  const normalizedSong = song.toLowerCase();
-  const normalizedArtist = artist.toLowerCase();
-  const alreadyAdded = arr.some(s => {
-    const setSong = String(s.song || '').trim().toLowerCase();
-    const setArtist = String(s.artist || '—').trim().toLowerCase();
-    return setSong === normalizedSong && setArtist === normalizedArtist;
-  });
-  if (alreadyAdded) { showToast('✓ Essa música já está no ensaio atual'); return; }
-
-  const nextSong = {
-    song,
-    artist,
-    youtube: r.youtube || '',
-    cifra: r.cifra || ''
-  };
-  arr.push(nextSong);
-  const ranked = sortSetlistByRanking(arr);
-  setlistData = { ...setlistData, [NEXT_SETLIST_KEY]: ranked };
-  await updateDoc(doc(db,'setlists','data'), { [NEXT_SETLIST_KEY]: ranked });
-  setlistLoaded = true;
-  renderRepFromCache();
-  showToast(`✓ "${song}" foi para o ensaio atual!`);
-  await writeLog('Música do repertório enviada ao ensaio', `${song} — ${artist}`, 'setlist');
-};
+// Rep to setlist removed
 
 window.openRepEdit = async id => {
   if (!isMember) return;
@@ -576,25 +498,7 @@ window.removeRepSong = async id => {
   showToast('Música removida.');
 };
 
-window.importSetlistToRep = async () => {
-  if (!isMember) return;
-  const songs = getActiveSetlistSongs();
-  if (!songs.length) { showToast('⚠ Nenhuma música no setlist atual'); return; }
-  const existing = repCache.map(({data:r}) => r.song.toLowerCase().trim());
-  const toAdd    = songs.filter(s => !existing.includes(s.song.toLowerCase().trim()));
-  if (!toAdd.length) { showToast('✓ Todas as músicas do setlist já estão no repertório'); return; }
-  const userName = auth.currentUser?.displayName||'Membro';
-  for (const s of toAdd) {
-    await addDoc(collection(db,'repertorio'), {
-      song: s.song, artist: s.artist||'—',
-      youtube: s.youtube||'', cifra: s.cifra||'',
-      addedAt: serverTimestamp(), by: userName
-    });
-  }
-  await loadRepertorioSnapshot(true);
-  await writeLog('Músicas importadas do setlist', `${toAdd.length} música${toAdd.length!==1?'s':''}`, 'repertorio');
-  showToast(`✓ ${toAdd.length} música${toAdd.length!==1?'s':''} importada${toAdd.length!==1?'s':''} para o repertório!`);
-};
+// Import setlist to rep removed
 
 // Auto links lookup
 window.findRepYoutube = async id => {
