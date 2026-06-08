@@ -112,8 +112,6 @@
     <button class="btn-ghost btn-sm member-admin-only" onclick="openAddMember()">+ Membro</button>
   </div>
 
-  <!-- Portal Admin Badge (visible to admin only) -->
-  <div class="member-admin-only" id="adminBadgeWrap" style="display:none"></div>
 
   <div class="members-grid" id="membrosGrid">
     <p style="color:var(--smoke);font-style:italic">Carregando...</p>
@@ -294,35 +292,10 @@ function applyAuth() {
   document.getElementById('loginBtnMobile').style.display  = isLoggedIn ? 'none' : '';
   document.getElementById('logoutBtnMobile').style.display = isLoggedIn ? '' : 'none';
   document.getElementById('navUserMobile').style.display   = isLoggedIn ? '' : 'none';
-  if (isMember) {
-    const wrap = document.getElementById('adminBadgeWrap');
-    if (wrap) {
-      wrap.style.display = 'block';
-      renderAdminBadge(wrap);
-    }
   }
 }
 
-// ─── ADMIN BADGE ──────────────────────────────────
-function renderAdminBadge(wrap) {
-  const user = auth.currentUser;
-  if (!user) return;
-  const name  = user.displayName?.split(' ').slice(0,2).join(' ') || user.email?.split('@')[0] || 'Membro';
-  const photo = user.photoURL || '';
-  const initials = (user.displayName || name).split(' ').map(w=>w[0]||'').join('').slice(0,2).toUpperCase();
-  wrap.innerHTML = `
-    <a href="logs.html" class="toca-badge" style="text-decoration:none">
-      ${photo
-        ? `<img src="${photo}" class="toca-badge-img" alt="${name}">`
-        : `<div class="toca-badge-img" style="background:linear-gradient(135deg,var(--brown),var(--wine));display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--gold)">${initials}</div>`
-      }
-      <div>
-        <div class="toca-badge-name">${name}</div>
-        <div class="toca-badge-sub">Membro do Filópaluza</div>
-        <div class="toca-chip">⚡ Portal Admin</div>
-      </div>
-    </a>`;
-}
+// Admin badge removed
 
 // ─── MEMBERS ──────────────────────────────────────
 async function loadMembers() {
