@@ -349,7 +349,7 @@ function renderMembers() {
       }
     }
 
-    return `<div class="member-card" onclick="isMember && openMemberModal('${id}')">
+    return `<div class="member-card" onclick="openMemberModal('${id}')">
       <div class="member-edit-hint">Clique para editar</div>
       <div class="member-avatar">${avatar}</div>
       <div class="member-name">${m.name || 'Sem nome'}</div>
