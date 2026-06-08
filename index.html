@@ -93,9 +93,12 @@
     
     <p class="hero-subtitle">O barzinho dos amigos</p>
 
-    <button id="btnInstallPwa" class="btn" style="display:none; margin: 1.5rem auto 0; align-items:center; justify-content:center; gap:0.5rem; animation: fadeUp 1.2s 0.2s ease both;">
-      <span style="font-size:1.2rem;">📱</span> Instalar Aplicativo
-    </button>
+    <div id="pwaPromptContainer" style="display:none; margin: 1.5rem auto 0; align-items:center; justify-content:center; gap:0.5rem; animation: fadeUp 1.2s 0.2s ease both;">
+      <button id="btnInstallPwa" class="btn" style="display:flex; align-items:center; gap:0.5rem; margin:0;">
+        <span style="font-size:1.2rem;">📱</span> Instalar Aplicativo
+      </button>
+      <button id="btnClosePwa" class="btn-icon" style="background:rgba(200,112,26,0.1); border:1px solid rgba(200,112,26,0.3); border-radius:50%; color:var(--smoke); cursor:pointer; width:36px; height:36px; display:flex; align-items:center; justify-content:center; transition:all 0.2s;" title="Agora não">✖</button>
+    </div>
   </div>
   <div class="scroll-hint">
     <span>Descer</span>
@@ -648,33 +651,40 @@ window.addEventListener('load', () => {
 
   // Handle Install Prompt
   let deferredPrompt;
+  const pwaContainer = document.getElementById('pwaPromptContainer');
   const btnInstallPwa = document.getElementById('btnInstallPwa');
+  const btnClosePwa = document.getElementById('btnClosePwa');
 
   window.addEventListener('beforeinstallprompt', (e) => {
-    // Prevent Chrome 67 and earlier from automatically showing the prompt
+    // Check if dismissed recently (15 days cooldown)
+    const dismissedTime = localStorage.getItem('pwaDismissedAt');
+    if (dismissedTime && (Date.now() - parseInt(dismissedTime) < 15 * 24 * 60 * 60 * 1000)) {
+      return; // Skip showing
+    }
+
     e.preventDefault();
-    // Stash the event so it can be triggered later.
     deferredPrompt = e;
-    // Update UI notify the user they can add to home screen
-    btnInstallPwa.style.display = 'flex';
+    pwaContainer.style.display = 'flex';
   });
 
   btnInstallPwa.addEventListener('click', async () => {
     if (deferredPrompt) {
-      // Show the prompt
       deferredPrompt.prompt();
-      // Wait for the user to respond to the prompt
       const { outcome } = await deferredPrompt.userChoice;
       if (outcome === 'accepted') {
-        btnInstallPwa.style.display = 'none';
+        pwaContainer.style.display = 'none';
       }
       deferredPrompt = null;
     }
   });
 
+  btnClosePwa.addEventListener('click', () => {
+    pwaContainer.style.display = 'none';
+    localStorage.setItem('pwaDismissedAt', Date.now().toString());
+  });
+
   window.addEventListener('appinstalled', () => {
-    // Hide the app-provided install promotion
-    btnInstallPwa.style.display = 'none';
+    pwaContainer.style.display = 'none';
     deferredPrompt = null;
     console.log('PWA was installed');
   });
