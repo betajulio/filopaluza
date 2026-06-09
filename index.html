@@ -199,7 +199,7 @@
     <input type="range" class="photo-crop-zoom" id="photoCropZoom" min="0.2" max="5" step="0.01" value="1">
     <div class="photo-crop-actions">
       <button class="btn-ghost btn-sm" onclick="cancelCrop()">Cancelar</button>
-      <button class="btn btn-sm" onclick="alert('0. Click registrado na tela!'); confirmCrop()">✓ Usar esta foto</button>
+      <button class="btn btn-sm" onclick="confirmCrop()">✓ Usar esta foto</button>
     </div>
   </div>
 </div>
@@ -580,7 +580,6 @@ window.cancelCrop = () => {
 
 window.confirmCrop = async () => {
   try {
-    alert('1. Função confirmCrop iniciou!');
     showToast('⏳ Processando imagem...');
     
     const SIZE = 320;
@@ -605,20 +604,17 @@ window.confirmCrop = async () => {
     const user = auth.currentUser;
     if (!user) { showToast('⚠ Faça login primeiro'); return; }
 
-    alert('2. Imagem processada, iniciando upload...');
     showToast('⏳ Enviando ao servidor...');
     const fRef = storageRef(storage, `members/${user.uid}/avatar.jpg`);
     await uploadBytesResumable(fRef, blob, { contentType: 'image/jpeg' });
     const url = await getDownloadURL(fRef);
     
-    alert('3. Upload finalizado!');
     const prev = document.getElementById('avatarPreview');
     if (prev) { prev.src = url; prev.style.display = 'block'; }
     
     document.getElementById('photoCropOverlay').style.display = 'none';
     showToast('✓ Foto carregada com sucesso!');
   } catch (e) {
-    alert('ERRO CATCH: ' + e.message);
     console.error('confirmCrop error:', e);
     showToast('⚠ Erro: ' + (e.message || 'Desconhecido'));
   }
