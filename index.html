@@ -496,7 +496,10 @@ window.saveMember = async () => {
   const recommendations = recLabels.map((l,i) => ({ label:l||`Indicação ${i+1}`, value:recValues[i]||'', link:recLinks[i]||'', imageUrl:recImages[i]||'' })).filter(r=>r.value);
 
   const prev = document.getElementById('avatarPreview');
-  const photoURL = prev?.src?.startsWith('http') ? prev.src : (membersCache.find(e=>e.id===editingMemberId)?.data?.photoURL || '');
+  let photoURL = membersCache.find(e=>e.id===editingMemberId)?.data?.photoURL || '';
+  if (prev && prev.dataset.uploadedUrl) {
+    photoURL = prev.dataset.uploadedUrl;
+  }
 
   const payload = { name, instruments, recommendations, photoURL, updatedAt: serverTimestamp() };
   try {
@@ -615,13 +618,17 @@ window.confirmCrop = async () => {
     if (!user) { showToast('⚠ Faça login primeiro'); return; }
 
     showToast('⏳ Enviando ao servidor...');
-    const memberId = window.editingMemberId || `new_${Date.now()}`;
+    const memberId = editingMemberId || `new_${Date.now()}`;
     const fRef = storageRef(storage, `members/${memberId}/avatar_${Date.now()}.jpg`);
     await uploadBytesResumable(fRef, blob, { contentType: 'image/jpeg' });
     const url = await getDownloadURL(fRef);
     
     const prev = document.getElementById('avatarPreview');
-    if (prev) { prev.src = url; prev.style.display = 'block'; }
+    if (prev) { 
+      prev.src = url; 
+      prev.dataset.uploadedUrl = url; // Save clean URL to dataset
+      prev.style.display = 'block'; 
+    }
     
     document.getElementById('photoCropOverlay').style.display = 'none';
     showToast('✓ Foto carregada com sucesso!');
