@@ -11,6 +11,13 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cinzel:wght@400;700;900&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <style>
+.rep-score-wrap{display:flex;align-items:center;gap:.5rem;margin-left:auto;flex-shrink:0}
+.rep-score-badge{font-family:'Playfair Display','Cinzel',serif;font-size:.85rem;font-weight:700;min-width:28px;text-align:center;padding:.15rem .4rem;border-radius:2px;line-height:1.2}
+.rep-score-positive{color:#6ee7b7;background:rgba(60,180,80,.1);border:1px solid rgba(60,180,80,.25)}
+.rep-score-negative{color:#fca5a5;background:rgba(180,60,60,.1);border:1px solid rgba(180,60,60,.25)}
+.rep-score-neutral{color:var(--smoke);background:rgba(200,112,26,.06);border:1px solid rgba(200,112,26,.15)}
+.rep-vote-row{display:flex;align-items:center;gap:.45rem;flex-wrap:nowrap}
+.rep-trophy{font-size:1rem;flex-shrink:0}
 @media(max-width:768px){
   main[style]{padding-top:68px!important;padding-left:0!important;padding-right:0!important}
   .repertorio-grid{grid-template-columns:1fr!important}
@@ -21,6 +28,8 @@
   .rep-info{flex:1 1 0;min-width:0}
   .rep-actions{flex-wrap:wrap;gap:.35rem;row-gap:.35rem;width:100%;justify-content:flex-start!important;max-width:100%!important;padding-left:calc(22px + .65rem)}
   .rep-actions .btn-icon{font-size:.65rem;padding:.28rem .5rem}
+.rep-score-wrap{margin-left:0;margin-top:.3rem}
+  .bulk-auto-row{flex-direction:column}
 }
 </style>
 </head>
@@ -88,7 +97,15 @@
           <div class="form-group"><label>Link Cifra (opcional)</label><input type="url" id="repCifra" placeholder="https://cifraclub.com.br/..."></div>
         </div>
         <button class="btn" onclick="addRepSong()">Adicionar ao Repertório</button>
-        
+        <div class="bulk-auto-row" style="display:flex;gap:.6rem;align-items:center;margin-top:.8rem;flex-wrap:wrap">
+          <button class="btn-ghost btn-sm" id="bulkAutoBtn" onclick="bulkAutoFill()" style="display:flex;align-items:center;gap:.4rem">
+            ⚡ Buscar vídeos e cifras automaticamente
+          </button>
+          <button class="btn-ghost btn-sm" onclick="printSetlist()" style="display:flex;align-items:center;gap:.4rem">
+            🖨 Imprimir Setlist
+          </button>
+          <span id="bulkAutoStatus" style="font-size:.72rem;color:var(--smoke);font-style:italic"></span>
+        </div>
       </div>
     </div>
 
@@ -365,13 +382,72 @@ function applyAuth() {
   });
 }
 
-// --- REPERTÓRIO LOGIC ---
+// --- MIGRATION: Sugestões → Repertório (one-time) ---
+async function migrateSuggestionsToRepertorio() {
+  if (!isMember) return;
+  try {
+    // Check if migration already done (using promotion_state which has write rules)
+    const flagSnap = await getDoc(doc(db, 'promotion_state', 'migration_sug_to_rep'));
+    if (flagSnap.exists() && flagSnap.data().done === true) return;
+
+    const sugSnap = await getDocs(collection(db, 'suggestions'));
+    if (sugSnap.empty) {
+      // No suggestions to migrate, mark as done anyway
+      await setDoc(doc(db, 'promotion_state', 'migration_sug_to_rep'), { done: true, at: serverTimestamp(), count: 0 });
+      return;
+    }
+
+    showToast('⏳ Migrando sugestões para o repertório...');
+    let count = 0;
+
+    for (const sugDoc of sugSnap.docs) {
+      const s = sugDoc.data();
+      // Create in repertório
+      await addDoc(collection(db, 'repertorio'), {
+        song: s.song || '',
+        artist: s.artist || '',
+        youtube: s.youtube || '',
+        cifra: '',
+        addedAt: s.createdAt || serverTimestamp(),
+        by: s.by || 'Migrado',
+        likes: s.likes || 0,
+        dislikes: s.dislikes || 0,
+        voterMap: s.voterMap || {}
+      });
+      // Delete from sugestões
+      await deleteDoc(doc(db, 'suggestions', sugDoc.id));
+      count++;
+    }
+
+    // Mark migration as done
+    await setDoc(doc(db, 'promotion_state', 'migration_sug_to_rep'), {
+      done: true,
+      at: serverTimestamp(),
+      count
+    });
+
+    await writeLog('Migração sugestões → repertório', `${count} música(s) transferida(s)`, 'repertorio');
+    showToast(`✓ ${count} música(s) migrada(s) para o repertório!`);
+  } catch (e) {
+    console.error('Migration error:', e);
+    showToast('⚠ Erro na migração de sugestões');
+  }
+}
 
 // --- REPERTÓRIO LOGIC ---
+
+function getRepScore(r) {
+  return (r.likes || 0) - (r.dislikes || 0);
+}
+
 async function loadRepertorioSnapshot(force = false) {
   if (repertorioLoaded && !force) {
     renderRepFromCache();
     return;
+  }
+  // Run one-time migration before first load
+  if (!repertorioLoaded && isMember) {
+    await migrateSuggestionsToRepertorio();
   }
   const snap = await getDocs(query(collection(db,'repertorio'), orderBy('addedAt','asc')));
   repCache = snap.docs.map(d=>({id:d.id,data:d.data()}));
@@ -386,18 +462,49 @@ function renderRepFromCache() {
     grid.innerHTML = `<p style="color:var(--smoke);font-style:italic;grid-column:1/-1">Nenhuma música ainda.</p>`;
     return;
   }
-  
-  const totalSongs = repCache.length;
-  const displaySongs = repertorioExpanded ? repCache : repCache.slice(0, 5);
-  
-  const items = displaySongs.map(({id, data: r}, i) => {
+
+  const uid = auth.currentUser?.uid || null;
+
+  // Sort by score descending, then by likes descending
+  const sorted = [...repCache].sort((a, b) => {
+    const sa = getRepScore(a.data), sb = getRepScore(b.data);
+    if (sb !== sa) return sb - sa;
+    return (b.data.likes || 0) - (a.data.likes || 0);
+  });
+
+  const trophies = ['🥇', '🥈', '🥉'];
+
+  const items = sorted.map(({id, data: r}, i) => {
+    const score = getRepScore(r);
+    const myVote = uid && r.voterMap ? r.voterMap[uid] : null;
+    const scoreClass = score > 0 ? 'rep-score-positive' : score < 0 ? 'rep-score-negative' : 'rep-score-neutral';
+    const trophy = i < 3 ? `<span class="rep-trophy">${trophies[i]}</span>` : '';
+
+    const likeBtn = `<button class="vote-btn${myVote === 'like' ? ' liked' : ''}"
+      onclick="voteRepSong('${id}','like');event.stopPropagation()"
+      ${!isMember ? 'disabled title="Faça login como membro"' : ''}
+      title="${myVote === 'like' ? 'Remover like' : 'Curtir'}">
+      👍 <span class="score-num">${r.likes || 0}</span>
+    </button>`;
+
+    const dislikeBtn = `<button class="vote-btn${myVote === 'dislike' ? ' disliked' : ''}"
+      onclick="voteRepSong('${id}','dislike');event.stopPropagation()"
+      ${!isMember ? 'disabled title="Faça login como membro"' : ''}
+      title="${myVote === 'dislike' ? 'Remover dislike' : 'Não curtir'}">
+      👎 <span class="score-num">${r.dislikes || 0}</span>
+    </button>`;
+
     const editBtn = isMember ? `<button class="btn-icon" onclick="openRepEdit('${id}');event.stopPropagation()">✎ Editar</button>` : '';
     const rmBtn   = isMember ? `<button class="setlist-remove" onclick="removeRepSong('${id}')">✕</button>` : '';
     return `<div class="rep-item">
-      <span class="rep-num">${i+1}</span>
+      <span class="rep-num">${trophy || (i + 1)}</span>
       <div class="rep-info">
         <div class="rep-song">${r.song}</div>
         <div class="rep-artist">${r.artist}</div>
+      </div>
+      <div class="rep-score-wrap">
+        <div class="rep-vote-row">${likeBtn}${dislikeBtn}</div>
+        <div class="rep-score-badge ${scoreClass}">${score > 0 ? '+' : ''}${score}</div>
       </div>
       <div class="rep-actions">
         ${r.youtube ? ytBtn(r.youtube) : `<button class="btn-icon" onclick="findRepYoutube('${id}');event.stopPropagation()">⚡ Auto vídeo</button>${ytSearchBtn(r.song, r.artist)}`}
@@ -407,21 +514,9 @@ function renderRepFromCache() {
       </div>
     </div>`;
   }).join('');
-  
-  const toggleBtn = totalSongs > 5 ? `
-    <div style="text-align:center;padding:1rem;grid-column:1/-1">
-      <button class="btn-ghost btn-sm" onclick="toggleRepertorioExpand()">
-        ${repertorioExpanded ? '▲ Ver menos' : `▼ Ver mais (${totalSongs - 5} ${totalSongs - 5 === 1 ? 'música' : 'músicas'})`}
-      </button>
-    </div>` : '';
-  
-  grid.innerHTML = items + toggleBtn;
-}
 
-window.toggleRepertorioExpand = () => {
-  repertorioExpanded = !repertorioExpanded;
-  renderRepFromCache();
-};
+  grid.innerHTML = items;
+}
 
 window.addRepSong = async () => {
   if (!isMember) { showToast('⚠ Acesso restrito a membros'); return; }
@@ -430,14 +525,51 @@ window.addRepSong = async () => {
   const youtube= document.getElementById('repYt').value.trim();
   const cifra  = document.getElementById('repCifra').value.trim();
   if (!song||!artist) { showToast('⚠ Preencha música e artista'); return; }
-  await addDoc(collection(db,'repertorio'),{song,artist,youtube,cifra,addedAt:serverTimestamp(),by:auth.currentUser?.displayName||'Membro'});
+  await addDoc(collection(db,'repertorio'),{song,artist,youtube,cifra,addedAt:serverTimestamp(),by:auth.currentUser?.displayName||'Membro',likes:0,dislikes:0,voterMap:{}});
   await loadRepertorioSnapshot(true);
   await writeLog('Música adicionada ao repertório', `${song} — ${artist}`, 'repertorio');
   ['repSong','repArtist','repYt','repCifra'].forEach(id=>document.getElementById(id).value='');
   showToast(`✓ "${song}" adicionada ao repertório!`);
 };
 
-// Rep to setlist removed
+// --- VOTE REP SONG ---
+window.voteRepSong = async (id, type) => {
+  if (!isMember) { showToast('⚠ Acesso restrito a membros'); return; }
+  const uid = auth.currentUser?.uid;
+  const snap = await getDoc(doc(db,'repertorio',id));
+  if (!snap.exists()) return;
+  const r = snap.data();
+
+  const voterMap = {...(r.voterMap || {})};
+  const current  = voterMap[uid];
+  let likes    = r.likes    || 0;
+  let dislikes = r.dislikes || 0;
+
+  if (current === type) {
+    // Toggle off
+    if (type === 'like')    likes--;
+    if (type === 'dislike') dislikes--;
+    delete voterMap[uid];
+  } else {
+    // Switch vote or new vote
+    if (current === 'like')    likes--;
+    if (current === 'dislike') dislikes--;
+    if (type === 'like')    likes++;
+    if (type === 'dislike') dislikes++;
+    voterMap[uid] = type;
+  }
+
+  await updateDoc(doc(db,'repertorio',id), { likes, dislikes, voterMap });
+  // Update local cache for instant re-render
+  const cached = repCache.find(e => e.id === id);
+  if (cached) {
+    cached.data.likes = likes;
+    cached.data.dislikes = dislikes;
+    cached.data.voterMap = voterMap;
+  }
+  renderRepFromCache();
+};
+
 
 window.openRepEdit = async id => {
   if (!isMember) return;
@@ -500,6 +632,205 @@ window.removeRepSong = async id => {
 
 // Import setlist to rep removed
 
+// --- PRINT SETLIST ---
+window.printSetlist = () => {
+  if (!repCache.length) { showToast('⚠ Nenhuma música no repertório'); return; }
+
+  const sorted = [...repCache].sort((a, b) => {
+    const sa = getRepScore(a.data), sb = getRepScore(b.data);
+    if (sb !== sa) return sb - sa;
+    return (b.data.likes || 0) - (a.data.likes || 0);
+  });
+
+  const set1 = sorted.slice(0, 30);
+  const set2 = sorted.slice(30);
+  const today = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+  const buildRows = (songs, offset = 0) => songs.map((s, i) => {
+    const r = s.data;
+    const num = offset + i + 1;
+    return `<tr>
+      <td class="num">${num}</td>
+      <td class="song">${r.song || ''}</td>
+      <td class="artist">${r.artist || ''}</td>
+    </tr>`;
+  }).join('');
+
+  const buildHorizontalTable = (songs, offset) => {
+    if (!songs.length) return '';
+    let rowsHtml = '';
+    for (let i = 0; i < songs.length; i += 2) {
+      const s1 = songs[i];
+      const r1 = s1.data;
+      const num1 = offset + i + 1;
+      
+      let td2 = '';
+      if (i + 1 < songs.length) {
+        const s2 = songs[i + 1];
+        const r2 = s2.data;
+        const num2 = offset + i + 2;
+        td2 = `<td class="num">${num2}.</td><td class="song">${r2.song || ''}</td><td class="artist">${r2.artist || ''}</td>`;
+      } else {
+        td2 = `<td class="num"></td><td class="song"></td><td class="artist"></td>`;
+      }
+
+      rowsHtml += `<tr>
+        <td class="num">${num1}.</td><td class="song">${r1.song || ''}</td><td class="artist">${r1.artist || ''}</td>
+        <td style="width:30px; border-bottom:none; background:#fff;"></td>
+        ${td2}
+      </tr>`;
+    }
+    return `<table>
+      <colgroup>
+        <col style="width:45px">
+        <col style="width:auto">
+        <col style="width:auto">
+        <col style="width:30px">
+        <col style="width:45px">
+        <col style="width:auto">
+        <col style="width:auto">
+      </colgroup>
+      <tbody>${rowsHtml}</tbody>
+    </table>`;
+  };
+
+  const html = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Setlist — Filópaluza</title>
+<style>
+  @page { margin: 12mm 10mm; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', 'Arial', sans-serif;
+    color: #111;
+    background: #fff;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .header {
+    text-align: center;
+    border-bottom: 3px solid #111;
+    padding-bottom: 10px;
+    margin-bottom: 14px;
+  }
+  .header h1 {
+    font-size: 32pt;
+    font-weight: 900;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+  .header .date {
+    font-size: 11pt;
+    color: #555;
+    margin-top: 2px;
+  }
+  .set-title {
+    font-size: 16pt;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    background: #111;
+    color: #fff;
+    padding: 5px 14px;
+    margin: 16px 0 8px;
+    display: inline-block;
+  }
+  .set-title.set2 {
+    background: #444;
+  }
+  .cols {
+    display: flex;
+    gap: 20px;
+  }
+  .cols > div {
+    flex: 1;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  tr {
+    border-bottom: 1px solid #ddd;
+  }
+  tr:nth-child(odd) {
+    background: #f5f5f5;
+  }
+  td {
+    padding: 5px 6px;
+    vertical-align: middle;
+  }
+  .num {
+    font-size: 12pt;
+    font-weight: 800;
+    width: 32px;
+    text-align: right;
+    padding-right: 8px;
+    color: #333;
+  }
+  .song {
+    font-size: 13pt;
+    font-weight: 700;
+  }
+  .artist {
+    font-size: 10pt;
+    color: #666;
+    font-style: italic;
+    white-space: nowrap;
+  }
+  .set1-section .song { font-size: 14pt; }
+  .set1-section .num { font-size: 13pt; }
+  .set2-section .song { font-size: 11pt; }
+  .set2-section .num { font-size: 10pt; }
+  .set2-section .artist { font-size: 9pt; }
+  .footer {
+    text-align: center;
+    margin-top: 20px;
+    padding-top: 8px;
+    border-top: 2px solid #111;
+    font-size: 9pt;
+    color: #888;
+  }
+  .count {
+    font-size: 10pt;
+    color: #888;
+    margin-left: 8px;
+    font-weight: 400;
+  }
+  @media print {
+    body { font-size: 12pt; }
+    .no-print { display: none !important; }
+  }
+</style>
+</head>
+<body>
+  <div class="no-print" style="text-align:center;padding:12px;background:#f0f0f0;border-bottom:1px solid #ccc">
+    <button onclick="window.print()" style="font-size:14pt;padding:8px 28px;cursor:pointer;font-weight:700;border:2px solid #111;background:#111;color:#fff;border-radius:4px">🖨 Imprimir</button>
+    <button onclick="window.close()" style="font-size:14pt;padding:8px 28px;cursor:pointer;font-weight:700;border:2px solid #999;background:#fff;color:#333;border-radius:4px;margin-left:8px">Fechar</button>
+  </div>
+  <div class="header">
+    <h1>🎶 Filópaluza</h1>
+    <div class="date">Setlist • ${today} • ${sorted.length} músicas</div>
+  </div>
+  <div class="set1-section">
+    <span class="set-title">Set 1 — Principais<span class="count">(${set1.length})</span></span>
+    ${buildHorizontalTable(set1, 0)}
+  </div>
+  ${set2.length ? `
+  <div class="set2-section">
+    <span class="set-title set2">Set 2 — Extras<span class="count">(${set2.length})</span></span>
+    ${buildHorizontalTable(set2, set1.length)}
+  </div>` : ''}
+  <div class="footer">Filópaluza • Setlist gerado em ${today}</div>
+</body>
+</html>`;
+
+  const w = window.open('', '_blank');
+  w.document.write(html);
+  w.document.close();
+};
+
 // Auto links lookup
 window.findRepYoutube = async id => {
   try {
@@ -544,6 +875,81 @@ window.chooseRepCifra = async id => {
     console.error('Auto rep cifra error:', err);
     showToast(`⚠ ${err.message || 'Não foi possível buscar a cifra.'}`);
   }
+};
+
+// --- BULK AUTO FILL (YouTube + Cifra) ---
+window.bulkAutoFill = async () => {
+  if (!isMember) { showToast('⚠ Acesso restrito a membros'); return; }
+
+  const btn = document.getElementById('bulkAutoBtn');
+  const status = document.getElementById('bulkAutoStatus');
+  if (!btn) return;
+
+  // Find songs missing youtube or cifra
+  const missing = repCache.filter(({ data: r }) => !r.youtube || !r.cifra);
+  if (!missing.length) {
+    showToast('✓ Todas as músicas já possuem vídeo e cifra!');
+    return;
+  }
+
+  const missingYt = missing.filter(({ data: r }) => !r.youtube);
+  const missingCifra = missing.filter(({ data: r }) => !r.cifra);
+  const totalTasks = missingYt.length + missingCifra.length;
+
+  if (!confirmAction(`Buscar automaticamente:\n• ${missingYt.length} vídeo(s)\n• ${missingCifra.length} cifra(s)\n\nIsso pode demorar um pouco. Continuar?`)) return;
+
+  btn.disabled = true;
+  btn.style.opacity = '.5';
+  let done = 0;
+  let errors = 0;
+
+  const updateStatus = (msg) => {
+    if (status) status.textContent = msg;
+  };
+
+  // Search YouTube for missing
+  for (const { id, data: r } of missingYt) {
+    try {
+      updateStatus(`🔎 Vídeo ${done + 1}/${totalTasks}: ${r.song}...`);
+      const data = await fetchFunctionJson('lookup_youtube_link', { song: r.song || '', artist: r.artist || '' });
+      if (data.url) {
+        await updateDoc(doc(db, 'repertorio', id), { youtube: data.url });
+        const cached = repCache.find(e => e.id === id);
+        if (cached) cached.data.youtube = data.url;
+      }
+    } catch (err) {
+      console.warn(`Auto YT error for ${r.song}:`, err);
+      errors++;
+    }
+    done++;
+  }
+
+  // Search Cifra for missing
+  for (const { id, data: r } of missingCifra) {
+    try {
+      updateStatus(`♫ Cifra ${done + 1}/${totalTasks}: ${r.song}...`);
+      const data = await fetchFunctionJson('lookup_cifra_candidates', { song: r.song || '', artist: r.artist || '' });
+      const candidates = Array.isArray(data.candidates) ? data.candidates : [];
+      if (candidates.length && candidates[0].url) {
+        await updateDoc(doc(db, 'repertorio', id), { cifra: candidates[0].url });
+        const cached = repCache.find(e => e.id === id);
+        if (cached) cached.data.cifra = candidates[0].url;
+      }
+    } catch (err) {
+      console.warn(`Auto cifra error for ${r.song}:`, err);
+      errors++;
+    }
+    done++;
+  }
+
+  btn.disabled = false;
+  btn.style.opacity = '';
+  renderRepFromCache();
+
+  const successCount = done - errors;
+  updateStatus('');
+  await writeLog('Busca automática em lote', `${successCount} encontrado(s), ${errors} erro(s)`, 'repertorio');
+  showToast(`✓ Busca concluída! ${successCount} encontrado(s)${errors ? `, ${errors} erro(s)` : ''}`);
 };
 
 // --- PROMOTION COUNTDOWNS ---

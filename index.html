@@ -225,7 +225,7 @@ let isMember   = false;
 let membersCache = [];
 let editingMemberId = null;
 let cropCanvas, cropCtx, cropImg;
-let cropX = 0, cropY = 0, cropZoom = 1;
+let cropX = 0, cropY = 0, cropZoom = 1, cropBaseScale = 1;
 let cropDragging = false, cropLastX = 0, cropLastY = 0;
 let cropResolve = null;
 
@@ -522,7 +522,15 @@ function openCrop(dataUrl) {
   cropImg = new Image();
   cropZoom = 1; cropX = 0; cropY = 0;
   document.getElementById('photoCropZoom').value = 1;
-  cropImg.onload = () => { cropCanvas.width = cropCanvas.offsetWidth; cropCanvas.height = cropCanvas.offsetHeight; drawCrop(); };
+  cropImg.onload = () => {
+    cropCanvas.width = cropCanvas.offsetWidth;
+    cropCanvas.height = cropCanvas.offsetHeight;
+    // Scale so the image covers the canvas at zoom=1
+    const scaleX = cropCanvas.width / cropImg.width;
+    const scaleY = cropCanvas.height / cropImg.height;
+    cropBaseScale = Math.max(scaleX, scaleY);
+    drawCrop();
+  };
   cropImg.src = dataUrl;
 
   const stage = document.getElementById('photoCropStage');
@@ -536,7 +544,8 @@ function drawCrop() {
   if (!cropCtx || !cropImg) return;
   const W = cropCanvas.width, H = cropCanvas.height;
   cropCtx.clearRect(0,0,W,H);
-  const iw = cropImg.width * cropZoom, ih = cropImg.height * cropZoom;
+  const iw = cropImg.width * cropBaseScale * cropZoom;
+  const ih = cropImg.height * cropBaseScale * cropZoom;
   cropCtx.drawImage(cropImg, W/2 - iw/2 + cropX, H/2 - ih/2 + cropY, iw, ih);
 }
 
@@ -548,7 +557,8 @@ window.confirmCrop = async () => {
   offscreen.width = offscreen.height = SIZE;
   const ctx = offscreen.getContext('2d');
   const scale = SIZE / cropCanvas.offsetWidth;
-  const iw = cropImg.width * cropZoom * scale, ih = cropImg.height * cropZoom * scale;
+  const iw = cropImg.width * cropBaseScale * cropZoom * scale;
+  const ih = cropImg.height * cropBaseScale * cropZoom * scale;
   ctx.drawImage(cropImg, SIZE/2 - iw/2 + cropX*scale, SIZE/2 - ih/2 + cropY*scale, iw, ih);
 
   offscreen.toBlob(async blob => {
