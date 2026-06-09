@@ -126,7 +126,7 @@ window.confirmAction = (msg) => confirm(msg);
 import {
   db, auth, provider,
   collection, doc, onSnapshot, addDoc, deleteDoc, updateDoc, setDoc, getDoc, getDocs, orderBy, query, serverTimestamp, runTransaction, Timestamp, increment,
-  signInWithPopup, signOut, onAuthStateChanged
+  signInWithPopup, signOut, onAuthStateChanged, logAction
 } from "./firebase-init.js";
 
 // --- STATE ---
@@ -209,20 +209,7 @@ async function fetchFunctionJson(path, params={}) {
 
 // --- LOGGING ---
 async function writeLog(action, detail, category) {
-  const user = auth.currentUser;
-  try {
-    await addDoc(collection(db,'logs'), {
-      action,
-      detail,
-      category,
-      who: user?.displayName || user?.email || 'Membro',
-      whoEmail: user?.email || '',
-      ts: serverTimestamp(),
-      tsLocal: new Date().toLocaleString('pt-BR')
-    });
-  } catch (e) {
-    console.warn('Write log error:', e);
-  }
+  await logAction(category, action, detail);
 }
 
 // --- ROLE AUTH ---
@@ -438,22 +425,7 @@ window.voteSuggestion = async (id, type) => {
   // AUTO REMOVAL LIMIT DISLIKES
   if (dislikes >= 3) {
     await deleteDoc(doc(db, 'suggestions', id));
-    await addDoc(collection(db,'logs'), {
-      action: 'Sugestão Removida',
-      detail: `${s.song} — ${s.artist} · ${likes}👍 ${dislikes}👎 · Motivo: Atingiu o limite de 3 dislikes`,
-      song: s.song,
-      artist: s.artist,
-      by: s.by,
-      likes: likes,
-      dislikes: dislikes,
-      reason: 'Atingiu o limite de 3 dislikes',
-      removedBy: 'Sistema',
-      category: 'sugestoes',
-      who: 'Sistema',
-      whoEmail: '',
-      ts: serverTimestamp(),
-      tsLocal: new Date().toLocaleString('pt-BR')
-    });
+    await logAction('sugestoes', 'Sugestão Removida', `${s.song} — ${s.artist} · ${likes}👍 ${dislikes}👎 · Motivo: Atingiu o limite de 3 dislikes`);
     await loadSuggestionsSnapshot(true);
     showToast('🗑 Sugestão removida (4+ dislikes)');
     return;
@@ -472,22 +444,7 @@ window.removeSuggestion = async id => {
   if (reason === null) return;
 
   await deleteDoc(doc(db,'suggestions',id));
-  await addDoc(collection(db,'logs'), {
-    action: 'Sugestão Removida',
-    detail: `${s.song} — ${s.artist} · ${s.likes || 0}👍 ${s.dislikes || 0}👎 · Motivo: ${reason || 'Removido pelo moderador'}`,
-    song: s.song,
-    artist: s.artist,
-    by: s.by,
-    likes: s.likes || 0,
-    dislikes: s.dislikes || 0,
-    reason: reason || 'Removido pelo moderador',
-    removedBy: auth.currentUser?.displayName?.split(' ')[0] || 'Membro',
-    category: 'sugestoes',
-    who: auth.currentUser?.displayName || auth.currentUser?.email || 'Membro',
-    whoEmail: auth.currentUser?.email || '',
-    ts: serverTimestamp(),
-    tsLocal: new Date().toLocaleString('pt-BR')
-  });
+  await logAction('sugestoes', 'Sugestão Removida', `${s.song} — ${s.artist} · ${s.likes || 0}👍 ${s.dislikes || 0}👎 · Motivo: ${reason || 'Removido pelo moderador'}`);
   await loadSuggestionsSnapshot(true);
   showToast('Sugestão removida.');
 };

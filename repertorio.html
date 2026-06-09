@@ -140,9 +140,9 @@ window.confirmAction = (msg) => confirm(msg);
 <!-- FIREBASE & CORE SCRIPT -->
 <script type="module">
 import {
-  db, auth, provider,
+  app, db, auth, provider,
   collection, doc, onSnapshot, addDoc, deleteDoc, updateDoc, setDoc, getDoc, getDocs, orderBy, query, serverTimestamp, runTransaction, Timestamp, increment,
-  signInWithPopup, signOut, onAuthStateChanged
+  signInWithPopup, signOut, onAuthStateChanged, logAction
 } from "./firebase-init.js";
 
 // --- STATE ---
@@ -176,20 +176,7 @@ function showToast(msg) {
 
 // --- LOGGING ---
 async function writeLog(action, detail, category) {
-  const user = auth.currentUser;
-  try {
-    await addDoc(collection(db,'logs'), {
-      action,
-      detail,
-      category,
-      who: user?.displayName || user?.email || 'Membro',
-      whoEmail: user?.email || '',
-      ts: serverTimestamp(),
-      tsLocal: new Date().toLocaleString('pt-BR')
-    });
-  } catch (e) {
-    console.warn('Write log error:', e);
-  }
+  await logAction(category, action, detail);
 }
 
 // --- READ AUDIT LOGGING ---

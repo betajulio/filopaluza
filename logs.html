@@ -9,34 +9,13 @@
   :root{--black:#0a0804;--dark:#130f09;--brown:#2a1a08;--amber:#c8820a;--gold:#e8a820;--cream:#f0e4c8;--rust:#8b3a0a;--paper:#d4c4a0;--smoke:#6b6050}
   *{margin:0;padding:0;box-sizing:border-box}
   body{background:var(--black);color:var(--cream);font-family:'Lora',serif;min-height:100vh}
-  body.auth-resolved #authBoot{opacity:0;pointer-events:none}
   body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:.4}
-
-  /* AUTH BOOT */
-  #authBoot{position:fixed;inset:0;z-index:10001;display:flex;align-items:center;justify-content:center;background:
-    radial-gradient(circle at top,rgba(200,130,10,.12),transparent 35%),
-    linear-gradient(180deg,#140d07 0%,#090603 100%);
-    transition:opacity .35s ease}
-  .auth-boot-panel{width:min(88vw,520px);border:1px solid rgba(200,130,10,.32);background:linear-gradient(180deg,rgba(36,23,10,.96),rgba(14,10,6,.96));box-shadow:0 20px 60px rgba(0,0,0,.6),0 0 0 2px rgba(200,130,10,.08) inset;padding:1.4rem 1.2rem 1.2rem;position:relative;overflow:hidden}
-  .auth-boot-panel::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(180deg,rgba(255,255,255,.035) 0 1px,transparent 1px 3px);opacity:.25;pointer-events:none}
-  .auth-boot-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;font-family:'Bebas Neue',sans-serif;letter-spacing:.18em;color:var(--gold);font-size:1rem}
-  .auth-boot-disc{width:84px;height:84px;border-radius:50%;margin:0 auto .9rem;background:url('imagens/filopaluza_logo.png') center/cover no-repeat;
-    border:1px solid rgba(200,130,10,.3);box-shadow:0 0 0 10px rgba(200,130,10,.05);animation:psxSpin 2.8s linear infinite}
-  .auth-boot-title{font-family:'Cinzel',serif;text-align:center;color:var(--cream);font-size:1.3rem;letter-spacing:.08em}
-  .auth-boot-sub{margin-top:.45rem;text-align:center;color:var(--smoke);font-size:.8rem;letter-spacing:.08em;text-transform:uppercase}
-  .auth-boot-bar{margin:1.1rem 0 .7rem;height:12px;border:1px solid rgba(200,130,10,.28);background:rgba(8,6,3,.95);position:relative;overflow:hidden}
-  .auth-boot-fill{height:100%;width:34%;background:linear-gradient(90deg,var(--rust),var(--amber),#f3cf62);box-shadow:0 0 12px rgba(200,130,10,.35);animation:psxLoad 1.2s steps(12,end) infinite}
-  .auth-boot-status{display:flex;justify-content:space-between;gap:1rem;font-family:'Bebas Neue',sans-serif;font-size:.85rem;letter-spacing:.12em;color:var(--paper)}
-  .auth-boot-status span:last-child{color:var(--gold)}
-  @keyframes psxSpin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
-  @keyframes psxLoad{0%{transform:translateX(-110%)}100%{transform:translateX(300%)}}
 
   /* NAV */
   nav{background:linear-gradient(180deg,rgba(10,8,4,.98),rgba(10,8,4,.85));border-bottom:1px solid rgba(200,130,10,.3);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:60px;backdrop-filter:blur(10px);position:sticky;top:0;z-index:100}
   .nav-logo{font-family:'Cinzel',serif;font-size:1.2rem;font-weight:900;color:var(--gold);letter-spacing:.15em;text-decoration:none}
   .nav-back{font-family:'Cinzel',serif;font-size:.75rem;color:var(--amber);letter-spacing:.1em;text-transform:uppercase;text-decoration:none;border:1px solid rgba(200,130,10,.3);padding:.4rem .9rem;border-radius:1px;transition:all .2s}
   .nav-back:hover{background:rgba(200,130,10,.1);border-color:var(--amber)}
-  .audit-only{display:none}
 
   /* LAYOUT */
   main{max-width:1000px;margin:0 auto;padding:3rem 1.5rem}
@@ -68,12 +47,6 @@
   .filter-count{font-size:.75rem;color:var(--smoke);font-style:italic;margin-left:auto}
 
   /* STATS */
-  .stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:.8rem;margin-bottom:2rem}
-  .stat-card{background:linear-gradient(135deg,rgba(42,26,8,.7),rgba(19,15,9,.8));border:1px solid rgba(200,130,10,.15);border-radius:1px;padding:.9rem 1rem;text-align:center}
-  .stat-num{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--gold);line-height:1}
-  .stat-label{font-size:.65rem;color:var(--smoke);letter-spacing:.1em;text-transform:uppercase;margin-top:.2rem}
-
-  /* DETAIL PANELS */
   .detail-section{margin-bottom:2rem}
   .detail-title{font-family:'Cinzel',serif;font-size:.95rem;color:var(--amber);letter-spacing:.08em;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
   .detail-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(200,130,10,.3),transparent)}
@@ -82,59 +55,10 @@
   .metric-label{font-size:.7rem;color:var(--smoke);letter-spacing:.08em;text-transform:uppercase;margin-bottom:.3rem}
   .metric-value{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--cream);line-height:1}
   .metric-value.gold{color:var(--gold)}
-  .metric-bar{height:4px;background:rgba(200,130,10,.1);border-radius:2px;margin-top:.5rem;overflow:hidden}
-  .metric-bar-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--amber),var(--gold))}
-  .top-table{width:100%;border-collapse:collapse}
-  .top-table td{padding:.5rem .8rem;font-size:.8rem;border-bottom:1px solid rgba(200,130,10,.06)}
-  .top-table td:first-child{color:var(--gold);font-family:'Bebas Neue',sans-serif;font-size:1rem;text-align:center;width:32px}
-  .top-table td:nth-child(2){color:var(--cream)}
-  .top-table td:last-child{text-align:right;color:var(--smoke);font-size:.75rem}
-  .participation-shell{margin-bottom:2.2rem}
-  .participation-note{font-size:.76rem;color:var(--smoke);font-style:italic;margin:-.35rem 0 1rem}
-  .podium-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.9rem;margin-bottom:1rem}
-  .podium-card{position:relative;padding:1.1rem 1rem 1rem;border:1px solid rgba(200,130,10,.16);background:linear-gradient(145deg,rgba(42,26,8,.78),rgba(17,13,8,.94));overflow:hidden}
-  .podium-card::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at top right,rgba(232,168,32,.12),transparent 44%);pointer-events:none}
-  .podium-card.top-1{border-color:rgba(232,168,32,.3)}
-  .podium-card.top-2{border-color:rgba(180,180,190,.26)}
-  .podium-card.top-3{border-color:rgba(181,101,29,.3)}
-  .podium-rank{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:.08em;color:var(--gold);margin-bottom:.7rem}
-  .podium-profile{display:flex;align-items:center;gap:.8rem}
-  .podium-avatar,.member-part-avatar{width:58px;height:58px;border-radius:50%;border:1px solid rgba(200,130,10,.22);background:linear-gradient(135deg,rgba(200,130,10,.14),rgba(20,16,10,.9));display:grid;place-items:center;overflow:hidden;color:var(--gold);font-family:'Cinzel',serif;font-size:1rem;letter-spacing:.08em}
-  .podium-avatar img,.member-part-avatar img{width:100%;height:100%;object-fit:cover}
-  .podium-name{font-family:'Cinzel',serif;font-size:.96rem;color:var(--cream)}
-  .podium-meta{font-size:.72rem;color:var(--smoke);margin-top:.16rem}
-  .podium-score{margin-top:.85rem;display:flex;gap:.7rem;flex-wrap:wrap}
-  .score-pill{display:inline-flex;align-items:center;gap:.32rem;padding:.24rem .58rem;border:1px solid rgba(200,130,10,.22);background:rgba(200,130,10,.08);font-size:.7rem;color:var(--paper);letter-spacing:.06em;text-transform:uppercase}
-  .member-part-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem}
-  .member-part-card{padding:1rem;border:1px solid rgba(200,130,10,.12);background:linear-gradient(145deg,rgba(29,21,12,.86),rgba(12,10,6,.94))}
-  .member-part-head{display:flex;gap:.85rem;align-items:center;margin-bottom:1rem}
-  .member-part-name{font-family:'Cinzel',serif;color:var(--cream);font-size:.95rem}
-  .member-part-email{font-size:.69rem;color:var(--smoke);word-break:break-word}
-  .member-part-goal{display:inline-flex;align-items:center;gap:.35rem;margin-top:.35rem;padding:.22rem .5rem;border:1px solid rgba(200,130,10,.18);font-size:.66rem;letter-spacing:.08em;text-transform:uppercase}
-  .member-part-goal.ok{color:#86efac;border-color:rgba(80,200,80,.28);background:rgba(80,200,80,.08)}
-  .member-part-goal.miss{color:#fbbf24;border-color:rgba(251,191,36,.28);background:rgba(251,191,36,.08)}
-  .member-stat-strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.55rem;margin-bottom:.9rem}
-  .member-mini-stat{padding:.55rem .45rem;border:1px solid rgba(200,130,10,.1);background:rgba(200,130,10,.04);text-align:center}
-  .member-mini-stat strong{display:block;font-family:'Bebas Neue',sans-serif;font-size:1.22rem;color:var(--gold);line-height:1}
-  .member-mini-stat span{display:block;font-size:.63rem;color:var(--smoke);letter-spacing:.08em;text-transform:uppercase;margin-top:.18rem}
-  .member-part-sub{font-size:.72rem;color:var(--smoke);margin-bottom:.7rem}
-  .member-cat-grid{display:flex;gap:.45rem;flex-wrap:wrap}
-  .member-cat-pill{display:inline-flex;align-items:center;justify-content:space-between;gap:.45rem;min-width:88px;padding:.28rem .48rem;border:1px solid rgba(200,130,10,.12);background:rgba(200,130,10,.04);font-size:.68rem;color:var(--paper)}
-  .member-cat-pill b{color:var(--gold);font-family:'Bebas Neue',sans-serif;font-size:.95rem;font-weight:400}
 
   /* LOG TABLE */
   .log-table{width:100%;border-collapse:collapse}
   .log-table th{font-family:'Cinzel',serif;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--amber);padding:.6rem 1rem;border-bottom:1px solid rgba(200,130,10,.25);text-align:left;background:rgba(42,26,8,.4);position:relative}
-  .sort-header{cursor:pointer;user-select:none;transition:color .15s}
-  .sort-header:hover{color:var(--gold)!important}
-  .sort-arrow{display:inline-block;font-size:.6rem;margin-left:.2rem;opacity:.4;transition:opacity .15s}
-  .sort-header:hover .sort-arrow{opacity:.8}
-  .sort-active .sort-arrow{opacity:1;color:var(--gold)}
-  .sort-header{cursor:pointer;user-select:none;transition:color .15s}
-  .sort-header:hover{color:var(--gold)!important}
-  .sort-arrow{display:inline-block;font-size:.65rem;margin-left:.2rem;opacity:.35;transition:opacity .15s}
-  .sort-header:hover .sort-arrow{opacity:.7}
-  .sort-active .sort-arrow{opacity:1}
   .log-table td{padding:.7rem 1rem;border-bottom:1px solid rgba(200,130,10,.06);font-size:.82rem;vertical-align:top}
   .log-table tr:hover td{background:rgba(200,130,10,.03)}
   .log-table tr.hidden-row{display:none}
@@ -143,85 +67,28 @@
   .cat-membros {background:rgba(60,100,200,.15);border:1px solid rgba(60,100,200,.3);color:#8ab4f8}
   .cat-sugestoes{background:rgba(200,130,10,.12);border:1px solid rgba(200,130,10,.3);color:var(--amber)}
   .cat-enquetes {background:rgba(130,60,200,.12);border:1px solid rgba(130,60,200,.3);color:#c084fc}
-  .cat-setlist  {background:rgba(30,150,80,.12);border:1px solid rgba(30,150,80,.3);color:#6ee7b7}
-  .cat-repertorio{background:rgba(200,80,30,.12);border:1px solid rgba(200,80,30,.3);color:#fca5a5}
-  .cat-forum    {background:rgba(200,160,20,.12);border:1px solid rgba(200,160,20,.3);color:#fde68a}
-  .cat-galeria  {background:rgba(20,160,180,.12);border:1px solid rgba(20,160,180,.3);color:#67e8f9}
+  .cat-repertorio{background:rgba(30,150,80,.12);border:1px solid rgba(30,150,80,.3);color:#6ee7b7}
   .cat-acesso   {background:rgba(80,200,80,.12);border:1px solid rgba(80,200,80,.3);color:#86efac}
+  
   .log-action{color:var(--cream);font-weight:600}
   .log-detail{color:var(--paper);font-size:.78rem;margin-top:.15rem}
   .log-who{color:var(--amber);font-size:.78rem}
   .log-ts{color:var(--smoke);font-size:.72rem;font-style:italic;white-space:nowrap}
   .empty-state{text-align:center;padding:3rem;color:var(--smoke);font-style:italic}
 
-  /* CLEAR BTN */
-  .danger-zone{margin-top:2.5rem;padding-top:1.5rem;border-top:1px solid rgba(200,130,10,.1);display:flex;align-items:center;justify-content:space-between;flex-wrap:gap}
-  .btn-danger{background:rgba(139,58,10,.2);border:1px solid rgba(139,58,10,.4);color:#fca5a5;padding:.5rem 1.2rem;font-family:'Cinzel',serif;font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;border-radius:1px;transition:all .2s}
-  .btn-danger:hover{background:rgba(139,58,10,.4)}
-  .admin-tools{margin:1.8rem 0 2rem;padding:1.1rem 1.2rem;border:1px solid rgba(248,113,113,.24);background:linear-gradient(135deg,rgba(48,20,14,.76),rgba(22,14,10,.94));border-radius:2px;box-shadow:0 10px 30px rgba(0,0,0,.2),0 0 0 1px rgba(248,113,113,.06) inset}
-  .admin-tools-head{display:flex;justify-content:space-between;gap:1rem;align-items:flex-start;flex-wrap:wrap;margin-bottom:1rem}
-  .admin-tools-title{font-family:'Cinzel',serif;font-size:1rem;color:#fcd6a5;letter-spacing:.06em}
-  .admin-tools-sub{font-size:.77rem;color:#d6b59a;max-width:720px;line-height:1.6}
-  .admin-tools-grid{display:flex;gap:.8rem;flex-wrap:wrap}
-  .admin-tools-warning{display:inline-flex;align-items:center;gap:.4rem;padding:.28rem .6rem;border:1px solid rgba(248,113,113,.3);background:rgba(248,113,113,.08);color:#fca5a5;font-size:.67rem;letter-spacing:.12em;text-transform:uppercase;font-family:'Cinzel',serif}
-  .admin-inline-config{margin-top:1rem;padding:1rem 1.1rem;border:1px solid rgba(200,130,10,.2);background:rgba(255,255,255,.025);display:flex;gap:1rem;align-items:flex-end;justify-content:space-between;flex-wrap:wrap}
-  .admin-inline-config-copy{flex:1 1 260px;min-width:220px}
-  .admin-inline-config-title{font-family:'Cinzel',serif;color:var(--cream);letter-spacing:.08em;text-transform:uppercase;font-size:.9rem}
-  .admin-inline-config-sub{margin-top:.25rem;color:var(--smoke);font-size:.8rem;line-height:1.5}
-  .admin-inline-config-controls{display:flex;gap:.7rem;align-items:flex-end;flex-wrap:wrap}
-  .admin-inline-field{display:flex;flex-direction:column;gap:.35rem;min-width:150px}
-  .admin-inline-field label{font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--smoke)}
-  .admin-inline-field input{background:rgba(255,255,255,.04);border:1px solid rgba(200,130,10,.28);color:var(--cream);padding:.7rem .8rem;font:inherit}
-  .coin-inline{display:inline-flex;align-items:center;gap:.32rem;line-height:1.2;vertical-align:middle;max-width:100%}
-  .coin-inline img{display:block;width:14px;height:14px;object-fit:contain;filter:drop-shadow(0 2px 4px rgba(0,0,0,.22));flex:0 0 auto}
-  .coin-inline strong,.coin-inline b{line-height:1}
-  .coin-amount{display:inline-flex;align-items:center;justify-content:center;gap:.42rem;line-height:1;white-space:nowrap;vertical-align:middle}
-  .coin-amount img{display:block;width:1.25em;height:1.25em;object-fit:contain;filter:drop-shadow(0 3px 6px rgba(0,0,0,.28));flex:0 0 auto}
-  .metric-value.coin-amount{justify-content:flex-start;gap:.5rem}
-  .metric-value.coin-amount img{width:32px;height:32px}
-  .score-pill.coin-score{font-size:.82rem;gap:.4rem}
-  .score-pill.coin-score img{width:22px;height:22px}
-  .member-mini-stat .coin-amount{width:100%}
-  .member-mini-stat .coin-amount img{width:26px;height:26px}
-
-  /* TOAST */
-  .toast{position:fixed;bottom:2rem;right:2rem;background:linear-gradient(135deg,var(--brown),rgba(19,15,9,.95));border:1px solid var(--amber);color:var(--cream);padding:1rem 1.5rem;border-radius:2px;font-size:.85rem;z-index:10000;transform:translateY(100px);opacity:0;transition:all .4s cubic-bezier(.34,1.56,.64,1)}
-  .toast.show{transform:translateY(0);opacity:1}
-
   @media(max-width:600px){
     main{padding:2rem 1rem}
     .page-title{font-size:1.4rem}
     .log-table th:nth-child(3),.log-table td:nth-child(3){display:none}
     .filters{gap:.4rem}
-    .stats-grid{grid-template-columns:repeat(3,1fr)}
-    .podium-grid{grid-template-columns:1fr}
-    .member-stat-strip{grid-template-columns:repeat(2,minmax(0,1fr))}
   }
 </style>
 </head>
 <body>
 
-<div id="authBoot">
-  <div class="auth-boot-panel">
-    <div class="auth-boot-head">
-      <span>Retorica System</span>
-      <span>PSX-LOG 01</span>
-    </div>
-    <div class="auth-boot-disc"></div>
-    <div class="auth-boot-title">Carregando Portal Admin</div>
-    <div class="auth-boot-sub">Verificando sessao e permissoes</div>
-    <div class="auth-boot-bar"><div class="auth-boot-fill"></div></div>
-    <div class="auth-boot-status">
-      <span>Autenticando</span>
-      <span>Please wait...</span>
-    </div>
-  </div>
-</div>
-
 <nav>
   <a class="nav-logo" href="index.html">Filópaluza</a>
   <div style="display:flex;gap:.55rem;align-items:center;flex-wrap:wrap;justify-content:flex-end">
-    <a class="nav-back audit-only" id="auditLink" href="audit.html">Auditoria</a>
     <a class="nav-back" href="index.html">← Voltar ao site</a>
   </div>
 </nav>
@@ -232,14 +99,11 @@
     <div class="lock-icon">🔒</div>
     <div class="login-title">Área restrita a membros</div>
     <div class="login-sub">Faça login com sua conta Google aprovada para ver os logs</div>
-    <button class="btn-google" onclick="doLogin()">
-      <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.569 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.707A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.707V4.961H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.039l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.961L3.964 6.293C4.672 4.166 6.656 3.58 9 3.58z"/></svg>
-      Entrar com Google
-    </button>
+    <button class="btn-google" onclick="doLogin()">Entrar com Google</button>
     <div class="denied-msg" id="deniedMsg" style="display:none"></div>
   </div>
 
-  <!-- LOG CONTENT (shown after login) -->
+  <!-- LOG CONTENT -->
   <div id="logContent">
     <div class="page-header">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem">
@@ -251,24 +115,8 @@
       </div>
     </div>
 
-    <!-- STORAGE METRIC -->
-    <div id="storageMetric"></div>
-
     <!-- REALTIME METRICS -->
     <div id="realtimeMetrics"></div>
-
-    <!-- PARTICIPAÇÃO DOS MEMBROS -->
-    <div id="memberParticipationStats"></div>
-
-    <div class="admin-tools audit-only" id="auditToolsNotice">
-      <div class="admin-tools-head">
-        <div>
-          <div class="admin-tools-title">Ferramentas Administrativas</div>
-          <div class="admin-tools-sub">As ações sensíveis foram movidas para a página de Auditoria para ficarem junto do monitoramento de leituras.</div>
-        </div>
-        <a class="btn-ghost" style="text-decoration:none;display:inline-flex;align-items:center" href="audit.html">Abrir Auditoria</a>
-      </div>
-    </div>
 
     <!-- FILTERS -->
     <div class="filters">
@@ -276,10 +124,7 @@
       <button class="filter-btn" onclick="setFilter('membros',this)">Membros</button>
       <button class="filter-btn" onclick="setFilter('sugestoes',this)">Sugestões</button>
       <button class="filter-btn" onclick="setFilter('enquetes',this)">Enquetes</button>
-      <button class="filter-btn" onclick="setFilter('setlist',this)">Setlist</button>
       <button class="filter-btn" onclick="setFilter('repertorio',this)">Repertório</button>
-      <button class="filter-btn" onclick="setFilter('forum',this)">Fórum</button>
-      <button class="filter-btn" onclick="setFilter('galeria',this)">Galeria</button>
       <button class="filter-btn" onclick="setFilter('acesso',this)">🔑 Acesso</button>
       <input class="filter-search" type="text" placeholder="Buscar nos logs…" oninput="applySearch(this.value)" id="searchInput">
       <span class="filter-count" id="filterCount"></span>
@@ -290,200 +135,45 @@
       <table class="log-table">
         <thead>
           <tr>
-            <th class="sort-header" onclick="sortBy('action')" data-sort="action">Ação <span class="sort-arrow"></span></th>
-            <th class="sort-header" onclick="sortBy('detail')" data-sort="detail">Detalhe <span class="sort-arrow"></span></th>
-            <th class="sort-header" onclick="sortBy('who')" data-sort="who">Quem <span class="sort-arrow"></span></th>
-            <th class="sort-header" onclick="sortBy('ts')" data-sort="ts">Quando <span class="sort-arrow"></span></th>
+            <th>Ação</th>
+            <th>Detalhe</th>
+            <th>Quem</th>
+            <th>Quando</th>
           </tr>
         </thead>
         <tbody id="logBody"></tbody>
       </table>
       <div class="empty-state" id="emptyState" style="display:none">Nenhum log encontrado.</div>
     </div>
+    
     <div style="margin-top:1rem;display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap">
       <div id="logsLoadedInfo" style="font-size:.72rem;color:var(--smoke)"></div>
       <button class="btn-ghost btn-sm" id="loadMoreLogsBtn" onclick="loadMoreLogs()" style="display:none">Carregar mais logs</button>
     </div>
-
   </div>
 </main>
 
-<div class="toast" id="toast"></div>
-
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import {
-  getFirestore, collection, doc, getDoc, getDocs,
-  orderBy, query, where, limit, startAfter,
-  addDoc, serverTimestamp, getCountFromServer
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import {
-  getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import {
-  getStorage, ref as storageRef, listAll
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+import { db, auth, provider, signInWithPopup, signOut, onAuthStateChanged, getDocs, collection, query, orderBy, limit, startAfter, getCountFromServer } from './firebase-init.js';
 
-const firebaseConfig = {
-  apiKey: "AIzaSyC0mNUcn7LrV2qVaSAMKowyKkdEFior9Jk",
-  authDomain: "filopaluza.firebaseapp.com",
-  projectId: "filopaluza",
-  storageBucket: "filopaluza.firebasestorage.app",
-  messagingSenderId: "517171630665",
-  appId: "1:517171630665:web:5c6fc5b7e4a0148cff2598"
-};
-
-const app      = initializeApp(firebaseConfig);
-const db       = getFirestore(app);
-const auth     = getAuth(app);
-const provider = new GoogleAuthProvider();
-const storage  = getStorage(app);
-let authResolved = false;
-const AUDIT_EMAIL = 'juliocereser@gmail.com';
-
-let allLogs      = [];
+let allLogs = [];
 let activeFilter = 'all';
 let activeSearch = '';
-let sortField    = 'ts';       // 'action','category','who','ts'
-let sortDir      = -1;          // -1 = desc, 1 = asc
-let lastLogDoc   = null;
-let hasMoreLogs  = true;
-const LOGS_PAGE_SIZE = 200;
-let storageStats   = { files: 0, bytes: 0 };
-let metricsSnapshot = null;
-let metricsLoadedAt = null;
-let participationLoadedAt = null;
-const READ_AUDIT_CONFIG_ID = 'readAudit';
-let readAuditCache = { checkedAt: 0, data: null };
-const TS_FIELDS  = ['ts','createdAt'];
-const PARTICIPATION_DAILY_GOAL = 1;
-const PARTICIPATION_BASE_COINS = 10;
-const PARTICIPATION_STREAK_BONUS_STEP = 2;
-const PARTICIPATION_STREAK_BONUS_CAP = 10;
-const PARTICIPATION_POINTS = {
-  acesso: 2,
-  sugestoes: 8,
-  enquetes: 6,
-  setlist: 6,
-  repertorio: 5,
-  forum: 5,
-  galeria: 5,
-  membros: 3
+let lastLogDoc = null;
+let hasMoreLogs = true;
+const LOGS_PAGE_SIZE = 100;
+
+const CAT_LABELS = {
+  membros: 'Membros',
+  sugestoes: 'Sugestões',
+  enquetes: 'Enquetes',
+  repertorio: 'Repertório',
+  acesso: 'Acesso'
 };
 
-function auditDateKey(date = new Date()) {
-  const pad = n => String(n).padStart(2, '0');
-  return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())} ${pad(date.getHours())}:00`;
-}
-
-function auditTimestampMs(value) {
-  if (!value) return 0;
-  if (typeof value.toMillis === 'function') return value.toMillis();
-  if (typeof value.toDate === 'function') return value.toDate().getTime();
-  return new Date(value).getTime() || 0;
-}
-
-async function getReadAuditConfig(force = false) {
-  const now = Date.now();
-  if (!force && readAuditCache.checkedAt && now - readAuditCache.checkedAt < 60000) return readAuditCache.data;
-  const snap = await getDoc(doc(db, 'config', READ_AUDIT_CONFIG_ID));
-  const data = snap.exists() ? snap.data() : null;
-  readAuditCache = { checkedAt: now, data };
-  return data;
-}
-
-function readAuditSeverity(estimatedReads) {
-  if (estimatedReads >= 200) return 'critical';
-  if (estimatedReads >= 50) return 'warning';
-  return 'info';
-}
-
-async function auditReadEvent({ action, collectionName, estimatedReads = 0, meta = {} }) {
-  if (!auth.currentUser || !action || !collectionName) return;
-  const config = await getReadAuditConfig().catch(() => null);
-  const expiresAt = auditTimestampMs(config?.expiresAt);
-  if (!config?.enabled || !config?.activeRunId || !expiresAt || expiresAt <= Date.now()) return;
-  const reads = Number(estimatedReads || 0);
-  try {
-    await addDoc(collection(db, 'read_audit_events'), {
-      auditId: config.activeRunId,
-      at: serverTimestamp(),
-      atLocal: new Date().toLocaleString('pt-BR'),
-      hourKey: auditDateKey(),
-      userEmail: auth.currentUser.email || '',
-      userName: auth.currentUser.displayName || auth.currentUser.email || 'Membro',
-      page: 'admin-logs',
-      action,
-      collection: collectionName,
-      estimatedReads: reads,
-      severity: readAuditSeverity(reads),
-      path: location.pathname,
-      userAgent: navigator.userAgent.slice(0, 180),
-      meta
-    });
-  } catch (err) {
-    console.warn('Read audit event error:', err);
-  }
-}
-
-// Firebase Storage Spark free tier: 5 GB
-const STORAGE_LIMIT = 5 * 1024 * 1024 * 1024; // 5 GB in bytes
-
-function formatBytes(b) {
-  if (b < 1024) return b + ' B';
-  if (b < 1024 * 1024) return (b / 1024).toFixed(1) + ' KB';
-  if (b < 1024 * 1024 * 1024) return (b / (1024 * 1024)).toFixed(2) + ' MB';
-  return (b / (1024 * 1024 * 1024)).toFixed(3) + ' GB';
-}
-
-function getBrazilDateKey(date = new Date()) {
-  return new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'America/Sao_Paulo',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit'
-  }).format(date);
-}
-
-function normalizeName(value = '') {
-  return value
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/[^\p{L}\p{N}]+/gu, ' ')
-    .trim();
-}
-
-function nameFromEmail(email = '') {
-  const local = (email || '').split('@')[0] || 'membro';
-  return local
-    .split(/[._-]+/)
-    .filter(Boolean)
-    .map(part => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ') || 'Membro';
-}
-
-function getInitials(name = '') {
-  const parts = (name || 'Membro').split(/\s+/).filter(Boolean).slice(0, 2);
-  return parts.map(part => part.charAt(0).toUpperCase()).join('') || 'M';
-}
-
-function calcStorageStats(galleryData = []) {
-  let totalBytes = 0;
-  galleryData.forEach(p => {
-    if (p.compSize) totalBytes += p.compSize * 1024;
-    else if (p.origSize) totalBytes += p.origSize * 1024;
-    else totalBytes += 500 * 1024; // fallback estimate
-  });
-  storageStats.files = galleryData.length;
-  storageStats.bytes = totalBytes;
-  renderStorageMetric();
-}
-
-// ─── AUTH ──────────────────────────────────────────────────────────
 async function isApproved(email) {
-  const snap = await getDoc(doc(db,'approved_emails', email.toLowerCase()));
-  return snap.exists();
+  const snap = await getDocs(collection(db, 'approved_emails'));
+  return snap.docs.some(d => d.id.toLowerCase() === email.toLowerCase());
 }
 
 onAuthStateChanged(auth, async user => {
@@ -493,22 +183,17 @@ onAuthStateChanged(auth, async user => {
       await signOut(auth);
       document.getElementById('deniedMsg').textContent = `${user.email} não está na lista de membros aprovados.`;
       document.getElementById('deniedMsg').style.display = 'block';
-      document.body.classList.add('auth-resolved');
-      authResolved = true;
       return;
     }
-    document.getElementById('loginWall').style.display    = 'none';
-    document.getElementById('logContent').style.display   = 'block';
-    document.getElementById('loggedAs').textContent       = `Logado como ${user.displayName || user.email}`;
-    const isAuditUser = (user.email || '').toLowerCase() === AUDIT_EMAIL;
-    document.querySelectorAll('.audit-only').forEach(el => el.style.display = isAuditUser ? '' : 'none');
-    startListening();
+    document.getElementById('loginWall').style.display = 'none';
+    document.getElementById('logContent').style.display = 'block';
+    document.getElementById('loggedAs').textContent = `Logado como ${user.displayName || user.email}`;
+    loadMetrics();
+    loadMoreLogs();
   } else {
-    document.getElementById('loginWall').style.display  = 'flex';
+    document.getElementById('loginWall').style.display = 'flex';
     document.getElementById('logContent').style.display = 'none';
   }
-  if (!authResolved) authResolved = true;
-  document.body.classList.add('auth-resolved');
 });
 
 window.doLogin = async () => {
@@ -522,613 +207,137 @@ window.doLogin = async () => {
     }
   } catch(e) {
     if (e.code === 'auth/popup-closed-by-user') return;
-    showToast('Erro ao entrar: ' + (e.message || 'Tente novamente.'));
+    alert('Erro ao entrar: ' + (e.message || 'Tente novamente.'));
   }
 };
 
-window.doLogout = async () => { await signOut(auth); };
+window.doLogout = () => signOut(auth);
 
-async function loadAdminMetricsSnapshot() {
-  const [
-    membersCountSnap,
-    approvedCountSnap,
-    forumCountSnap,
-    suggestionsCountSnap,
-    pollsCountSnap,
-    closedPollsCountSnap,
-    galleryCountSnap,
-    gallerySampleSnap
-  ] = await Promise.all([
-    getCountFromServer(collection(db, 'members')),
-    getCountFromServer(collection(db, 'approved_emails')),
-    getCountFromServer(collection(db, 'forum')),
-    getCountFromServer(collection(db, 'suggestions')),
-    getCountFromServer(collection(db, 'polls')),
-    getCountFromServer(query(collection(db, 'polls'), where('closed', '==', true))),
-    getCountFromServer(collection(db, 'gallery')),
-    getDocs(query(collection(db, 'gallery'), orderBy('createdAt', 'desc'), limit(50)))
-  ]);
-
-  const galleryDocs = gallerySampleSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-  auditReadEvent({
-    action: 'admin-metrics',
-    collectionName: 'gallery',
-    estimatedReads: gallerySampleSnap.size,
-    meta: { gallerySample: gallerySampleSnap.size, aggregationQueries: 7 }
-  });
-  calcStorageStats(galleryDocs);
-
-  let totalGallLikes = 0, totalGallComments = 0, totalGallReplies = 0;
-  galleryDocs.forEach(p => {
-    const r = p.reactions || {};
-    totalGallLikes += Object.keys(r).filter(k => r[k] === 'like').length;
-    totalGallComments += typeof p.commentCount === 'number' ? p.commentCount : (p.comments || []).length;
-    totalGallReplies += typeof p.replyCount === 'number'
-      ? p.replyCount
-      : (p.comments || []).reduce((sum, c) => sum + ((c.replies || []).length), 0);
-  });
-
-  metricsSnapshot = {
-    members: membersCountSnap.data().count,
-    approvals: approvedCountSnap.data().count,
-    forums: forumCountSnap.data().count,
-    suggestions: suggestionsCountSnap.data().count,
-    polls: pollsCountSnap.data().count,
-    closedPolls: closedPollsCountSnap.data().count,
-    gallery: galleryCountSnap.data().count,
-    totalGallLikes,
-    totalGallComments,
-    totalGallReplies,
-    galleryMetricsSampleSize: galleryDocs.length
-  };
-  metricsLoadedAt = new Date();
-  renderRealtimeMetrics();
-}
-
-function renderRealtimeMetrics() {
-  const el = document.getElementById('realtimeMetrics');
-  if (!el || !metricsSnapshot) return;
-  const {
-    members,
-    approvals,
-    forums,
-    suggestions,
-    polls,
-    closedPolls,
-    gallery,
-    totalGallLikes,
-    totalGallComments,
-    totalGallReplies,
-    galleryMetricsSampleSize
-  } = metricsSnapshot;
-  const updatedLabel = metricsLoadedAt
-    ? metricsLoadedAt.toLocaleString('pt-BR')
-    : '—';
-
-  el.innerHTML = `
-    <div class="detail-section">
-      <div class="detail-title">Resumo Atual <span style="font-size:.68rem;color:var(--smoke);font-style:italic;font-weight:400;letter-spacing:.04em">Atualizado em ${updatedLabel}</span></div>
-      <div class="metric-row">
-        <div class="metric-card">
-          <div class="metric-label">Membros da Banda</div>
-          <div class="metric-value gold">${members}</div>
-          <div style="font-size:.7rem;color:var(--smoke);margin-top:.2rem">${approvals} e-mail${approvals!==1?'s':''} aprovado${approvals!==1?'s':''}</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-label">Fotos na Galeria</div>
-          <div class="metric-value gold">${gallery}</div>
-          <div style="font-size:.7rem;color:var(--smoke);margin-top:.2rem">Últimas ${galleryMetricsSampleSize}: 👍 ${totalGallLikes} · 💬 ${totalGallComments} comentários · ↩ ${totalGallReplies} respostas</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-label">Tópicos no Fórum</div>
-          <div class="metric-value gold">${forums}</div>
-          <div style="font-size:.7rem;color:var(--smoke);margin-top:.2rem">Contagem de tópicos cadastrados</div>
-        </div>
-      </div>
-      <div class="metric-row">
-        <div class="metric-card">
-          <div class="metric-label">Sugestões de Músicas</div>
-          <div class="metric-value gold">${suggestions}</div>
-          <div style="font-size:.7rem;color:var(--smoke);margin-top:.2rem">Total atual de sugestões abertas</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-label">Enquetes Ativas</div>
-          <div class="metric-value gold">${polls}</div>
-          <div style="font-size:.7rem;color:var(--smoke);margin-top:.2rem">${closedPolls} encerrada${closedPolls!==1?'s':''} registradas</div>
-        </div>
-      </div>
-    </div>`;
-}
-
-function createParticipant(seed = {}) {
-  return {
-    key: seed.key || '',
-    email: seed.email || '',
-    name: seed.name || '',
-    photo: seed.photo || '',
-    coins: Number(seed.coins || 0),
-    streakDays: Number(seed.streakDays || 0),
-    longestStreak: Number(seed.longestStreak || 0),
-    totalLoginDays: Number(seed.totalLoginDays || 0),
-    lastAwardCoins: Number(seed.lastAwardCoins || 0),
-    lastLoginKey: seed.lastLoginKey || '',
-    recentLoginKeys: Array.isArray(seed.recentLoginKeys) ? [...seed.recentLoginKeys] : [],
-    lastSeenLocal: seed.lastSeenLocal || '',
-    totalActions: 0,
-    actionsByCat: {
-      acesso: 0,
-      sugestoes: 0,
-      enquetes: 0,
-      setlist: 0,
-      repertorio: 0,
-      forum: 0,
-      galeria: 0,
-      membros: 0
-    },
-    actionPoints: 0,
-    loginDaysSet: new Set()
-  };
-}
-
-function mergeParticipant(target, incoming = {}) {
-  if (incoming.email && !target.email) target.email = incoming.email;
-  if (incoming.name && (!target.name || target.name === nameFromEmail(target.email))) target.name = incoming.name;
-  if (incoming.photo && !target.photo) target.photo = incoming.photo;
-  if (incoming.coins !== undefined) target.coins = Number(incoming.coins || 0);
-  if (incoming.streakDays !== undefined) target.streakDays = Number(incoming.streakDays || 0);
-  if (incoming.longestStreak !== undefined) target.longestStreak = Number(incoming.longestStreak || 0);
-  if (incoming.totalLoginDays !== undefined) target.totalLoginDays = Number(incoming.totalLoginDays || 0);
-  if (incoming.lastAwardCoins !== undefined) target.lastAwardCoins = Number(incoming.lastAwardCoins || 0);
-  if (incoming.lastLoginKey) target.lastLoginKey = incoming.lastLoginKey;
-  if (Array.isArray(incoming.recentLoginKeys) && incoming.recentLoginKeys.length) target.recentLoginKeys = [...incoming.recentLoginKeys];
-  if (incoming.lastSeenLocal) target.lastSeenLocal = incoming.lastSeenLocal;
-  if (incoming.totalActions !== undefined) target.totalActions = Number(incoming.totalActions || 0);
-  if (incoming.actionsByCat && typeof incoming.actionsByCat === 'object') {
-    Object.entries(incoming.actionsByCat).forEach(([cat, count]) => {
-      if (target.actionsByCat[cat] !== undefined) target.actionsByCat[cat] = Number(count || 0);
-    });
-  }
-}
-
-function buildParticipantScore(member) {
-  const activeCategories = Object.values(member.actionsByCat).filter(count => count > 0).length;
-  return (
-    member.coins +
-    (member.streakDays * 12) +
-    (member.totalActions * 6) +
-    (activeCategories * 8) +
-    (member.totalLoginDays * 3)
-  );
-}
-
-function renderParticipationStats(participants = []) {
-  const el = document.getElementById('memberParticipationStats');
-  if (!el) return;
-
-  if (!participants.length) {
-    el.innerHTML = `
-      <div class="detail-section participation-shell">
-        <div class="detail-title">🏆 Participação dos Membros</div>
-        <div class="participation-note">Assim que os membros logarem e interagirem, esta área começa a montar a trilha de participação, Retorica Coin e streaks.</div>
-      </div>`;
-    return;
-  }
-
-  const todayKey = getBrazilDateKey();
-  const membersDoneToday = participants.filter(member => member.lastLoginKey === todayKey).length;
-  const totalCoins = participants.reduce((sum, member) => sum + member.coins, 0);
-  const topStreak = participants.reduce((max, member) => Math.max(max, member.longestStreak || 0), 0);
-  const podium = [...participants].sort((a, b) => b.score - a.score).slice(0, 3);
-  const updatedLabel = participationLoadedAt ? participationLoadedAt.toLocaleString('pt-BR') : '—';
-
-  const summaryCards = `
-    <div class="metric-row">
-      <div class="metric-card">
-        <div class="metric-label">Meta diária de login</div>
-        <div class="metric-value gold">${membersDoneToday}/${participants.length}</div>
-        <div style="font-size:.7rem;color:var(--smoke);margin-top:.2rem">Meta definida: ${PARTICIPATION_DAILY_GOAL} login por dia</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-label">Retorica Coin em circulação</div>
-        <div class="metric-value gold coin-amount"><img src="imagens/coin.png" alt="Retorica Coin"><span>${totalCoins}</span></div>
-        <div style="font-size:.7rem;color:var(--smoke);margin-top:.2rem">Cada login diário rende ${PARTICIPATION_BASE_COINS} Retorica Coin + bônus de sequência</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-label">Maior streak já registrado</div>
-        <div class="metric-value gold">${topStreak}</div>
-        <div style="font-size:.7rem;color:var(--smoke);margin-top:.2rem">Bônus de sequência atual: +${PARTICIPATION_STREAK_BONUS_STEP} por dia, até +${PARTICIPATION_STREAK_BONUS_CAP}</div>
-      </div>
-    </div>`;
-
-  const podiumCards = podium.map((member, index) => `
-    <div class="podium-card top-${index + 1}">
-      <div class="podium-rank">${['🥇 #1', '🥈 #2', '🥉 #3'][index]}</div>
-      <div class="podium-profile">
-        <div class="podium-avatar">${member.photo ? `<img src="${member.photo}" alt="${member.name}">` : getInitials(member.name)}</div>
-        <div>
-          <div class="podium-name">${member.name}</div>
-          <div class="podium-meta">${member.totalActions} ações · ${member.totalLoginDays} login${member.totalLoginDays !== 1 ? 's' : ''} com recompensa</div>
-        </div>
-      </div>
-      <div class="podium-score">
-        <span class="score-pill">Score <strong>${member.score}</strong></span>
-        <span class="score-pill coin-score"><span class="coin-amount"><img src="imagens/coin.png" alt="Retorica Coin"><strong>${member.coins}</strong><span>RC</span></span></span>
-        <span class="score-pill">🔥 ${member.streakDays}</span>
-      </div>
-    </div>`).join('');
-
-  const memberCards = participants.map(member => {
-    const goalDone = member.lastLoginKey === todayKey;
-    const lastSeen = member.lastSeenLocal || 'Ainda sem login premiado';
-    const sortedCats = Object.entries(member.actionsByCat)
-      .filter(([, count]) => count > 0)
-      .sort((a, b) => b[1] - a[1]);
-    const catMarkup = sortedCats.length
-      ? sortedCats.map(([cat, count]) => `<span class="member-cat-pill">${CAT_LABELS[cat] || cat}<b>${count}</b></span>`).join('')
-      : `<span class="member-part-sub">Sem atividade registrada além do login até agora.</span>`;
-
-    return `
-      <article class="member-part-card">
-        <div class="member-part-head">
-          <div class="member-part-avatar">${member.photo ? `<img src="${member.photo}" alt="${member.name}">` : getInitials(member.name)}</div>
-          <div style="min-width:0">
-            <div class="member-part-name">${member.name}</div>
-            <div class="member-part-email">${member.email || 'Sem e-mail vinculado'}</div>
-            <div class="member-part-goal ${goalDone ? 'ok' : 'miss'}">${goalDone ? '✓ meta diária batida' : '⌛ falta login hoje'}</div>
+async function loadMetrics() {
+  try {
+    const [members, approvals, suggestions, repertorio] = await Promise.all([
+      getCountFromServer(collection(db, 'members')),
+      getCountFromServer(collection(db, 'approved_emails')),
+      getCountFromServer(collection(db, 'suggestions')),
+      getCountFromServer(collection(db, 'repertorio'))
+    ]);
+    
+    document.getElementById('realtimeMetrics').innerHTML = `
+      <div class="detail-section">
+        <div class="detail-title">Métricas Atuais</div>
+        <div class="metric-row">
+          <div class="metric-card">
+            <div class="metric-label">Membros</div>
+            <div class="metric-value gold">${members.data().count}</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Acessos</div>
+            <div class="metric-value gold">${approvals.data().count}</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Sugestões</div>
+            <div class="metric-value gold">${suggestions.data().count}</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Músicas Repertório</div>
+            <div class="metric-value gold">${repertorio.data().count}</div>
           </div>
         </div>
-        <div class="member-stat-strip">
-          <div class="member-mini-stat"><strong>${member.score}</strong><span>Score</span></div>
-          <div class="member-mini-stat"><div class="coin-amount"><img src="imagens/coin.png" alt="Retorica Coin"><strong>${member.coins}</strong></div><span>Retorica Coin</span></div>
-          <div class="member-mini-stat"><strong>${member.streakDays}</strong><span>Streak</span></div>
-          <div class="member-mini-stat"><strong>${member.totalActions}</strong><span>Ações</span></div>
-        </div>
-        <div class="member-part-sub">Último login com recompensa: ${lastSeen}</div>
-        <div class="member-part-sub">Recorde de sequência: ${member.longestStreak} · Último ganho: <span class="coin-inline"><img src="imagens/coin.png" alt="Retorica Coin">${member.lastAwardCoins} Retorica Coin</span></div>
-        <div class="member-cat-grid">${catMarkup}</div>
-      </article>`;
-  }).join('');
-
-  el.innerHTML = `
-    <div class="detail-section participation-shell">
-      <div class="detail-title">🏆 Participação dos Membros <span style="font-size:.68rem;color:var(--smoke);font-style:italic;font-weight:400;letter-spacing:.04em">Atualizado em ${updatedLabel}</span></div>
-      <div class="participation-note">Score calculado por <span class="coin-inline"><img src="imagens/coin.png" alt="Retorica Coin">Retorica Coin</span> de presença, streak de login e volume de interação nas áreas do site.</div>
-      ${summaryCards}
-      <div class="podium-grid">${podiumCards}</div>
-      <div class="member-part-grid">${memberCards}</div>
-    </div>`;
-}
-
-async function loadParticipationStats() {
-  const [membersSnap, approvedSnap, memberStatsSnap] = await Promise.all([
-    getDocs(collection(db, 'members')),
-    getDocs(collection(db, 'approved_emails')),
-    getDocs(collection(db, 'member_stats'))
-  ]);
-  auditReadEvent({
-    action: 'admin-participation',
-    collectionName: 'members+approved_emails+member_stats',
-    estimatedReads: membersSnap.size + approvedSnap.size + memberStatsSnap.size,
-    meta: { members: membersSnap.size, approved: approvedSnap.size, memberStats: memberStatsSnap.size }
-  });
-
-  const participants = new Map();
-  const aliasByName = new Map();
-  const membersByName = new Map();
-  const approvedEmails = new Set(approvedSnap.docs.map(docSnap => docSnap.id.toLowerCase()));
-
-  function ensureParticipant(key, seed = {}) {
-    if (!participants.has(key)) participants.set(key, createParticipant({ key, ...seed }));
-    const target = participants.get(key);
-    mergeParticipant(target, seed);
-    if (target.name) aliasByName.set(normalizeName(target.name), key);
-    return target;
-  }
-
-  membersSnap.docs.forEach(docSnap => {
-    const data = docSnap.data() || {};
-    const normName = normalizeName(data.name || '');
-    if (normName) membersByName.set(normName, { ...data, id: docSnap.id });
-  });
-
-  approvedSnap.docs.forEach(docSnap => {
-    const email = docSnap.id.toLowerCase();
-    ensureParticipant(`email:${email}`, {
-      email,
-      name: nameFromEmail(email)
-    });
-  });
-
-  memberStatsSnap.docs.forEach(docSnap => {
-    const data = docSnap.data() || {};
-    const email = docSnap.id.toLowerCase();
-    if (!approvedEmails.has(email)) return;
-    const participant = ensureParticipant(`email:${email}`, {
-      email,
-      name: data.name || nameFromEmail(email),
-      coins: data.coins,
-      streakDays: data.streakDays,
-      longestStreak: data.longestStreak,
-      totalLoginDays: data.totalLoginDays,
-      lastAwardCoins: data.lastAwardCoins,
-      lastLoginKey: data.lastLoginKey,
-      recentLoginKeys: data.recentLoginKeys,
-      lastSeenLocal: data.lastSeenLocal,
-      totalActions: data.totalActions,
-      actionsByCat: data.actionsByCat
-    });
-    const memberMatch = membersByName.get(normalizeName(participant.name));
-    if (memberMatch?.photo) participant.photo = memberMatch.photo;
-  });
-
-  membersSnap.docs.forEach(docSnap => {
-    const data = docSnap.data() || {};
-    const normName = normalizeName(data.name || '');
-    const aliasKey = aliasByName.get(normName);
-    if (!aliasKey || !participants.has(aliasKey)) return;
-    const participant = participants.get(aliasKey);
-    if (data.name && !participant.name) participant.name = data.name;
-    if (data.photo && !participant.photo) participant.photo = data.photo;
-  });
-
-  const todayKey = getBrazilDateKey();
-  const finalParticipants = [...participants.values()].map(member => {
-    if ((!member.photo || !member.photo.trim()) && member.name) {
-      const memberMatch = membersByName.get(normalizeName(member.name));
-      if (memberMatch?.photo) member.photo = memberMatch.photo;
-    }
-    if (!member.totalLoginDays && member.loginDaysSet.size) member.totalLoginDays = member.loginDaysSet.size;
-    if (!member.lastLoginKey && member.loginDaysSet.has(todayKey)) member.lastLoginKey = todayKey;
-    member.score = buildParticipantScore(member);
-    return member;
-  }).sort((a, b) => b.score - a.score || b.coins - a.coins || a.name.localeCompare(b.name, 'pt-BR'));
-
-  participationLoadedAt = new Date();
-  renderParticipationStats(finalParticipants);
-}
-
-// ─── LOGS ──────────────────────────────────────────────────────────
-const CAT_LABELS = {
-  membros:'Membros', sugestoes:'Sugestões', enquetes:'Enquetes',
-  setlist:'Setlist', repertorio:'Repertório', forum:'Fórum', galeria:'Galeria',
-  acesso:'Acesso'
-};
-
-function startListening() {
-  loadAdminMetricsSnapshot().catch(err => {
-    console.warn('Metrics load error:', err);
-  });
-  loadParticipationStats().catch(err => {
-    console.warn('Participation load error:', err);
-    showToast('⚠ Não foi possível montar o painel de participação.');
-  });
-  loadInitialLogs().catch(err => {
-    console.warn('Logs load error:', err);
-    showToast('⚠ Não foi possível carregar os logs.');
-  });
-}
-
-async function loadLogsPage() {
-  let q = query(collection(db, 'logs'), orderBy('ts', 'desc'), limit(LOGS_PAGE_SIZE));
-  if (lastLogDoc) q = query(collection(db, 'logs'), orderBy('ts', 'desc'), startAfter(lastLogDoc), limit(LOGS_PAGE_SIZE));
-  const snap = await getDocs(q);
-  auditReadEvent({ action: 'admin-logs-page', collectionName: 'logs', estimatedReads: snap.size, meta: { pageSize: LOGS_PAGE_SIZE } });
-  const docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-  if (snap.docs.length) lastLogDoc = snap.docs[snap.docs.length - 1];
-  hasMoreLogs = snap.docs.length === LOGS_PAGE_SIZE;
-  return docs;
-}
-
-async function loadInitialLogs() {
-  allLogs = [];
-  lastLogDoc = null;
-  hasMoreLogs = true;
-  const docs = await loadLogsPage();
-  allLogs = docs;
-  renderTable();
+      </div>
+    `;
+  } catch(e) { console.error('Error loading metrics', e); }
 }
 
 window.loadMoreLogs = async () => {
+  if (!hasMoreLogs) return;
   const btn = document.getElementById('loadMoreLogsBtn');
-  if (!hasMoreLogs || !btn) return;
-  const prevText = btn.textContent;
   btn.textContent = 'Carregando...';
-  btn.disabled = true;
   try {
-    const docs = await loadLogsPage();
-    allLogs = [...allLogs, ...docs];
-    renderTable();
-  } catch (err) {
-    console.error('Load more logs error:', err);
-    showToast('⚠ Não foi possível carregar mais logs.');
-  } finally {
-    btn.textContent = prevText;
-    btn.disabled = false;
+    let q = query(collection(db, 'logs'), orderBy('ts', 'desc'), limit(LOGS_PAGE_SIZE));
+    if (lastLogDoc) q = query(collection(db, 'logs'), orderBy('ts', 'desc'), startAfter(lastLogDoc), limit(LOGS_PAGE_SIZE));
+    
+    const snap = await getDocs(q);
+    if (snap.empty) {
+      hasMoreLogs = false;
+      btn.style.display = 'none';
+      return;
+    }
+    
+    lastLogDoc = snap.docs[snap.docs.length - 1];
+    
+    const newLogs = snap.docs.map(doc => {
+      const data = doc.data();
+      return { id: doc.id, ...data, tsDate: data.ts ? data.ts.toDate() : new Date() };
+    });
+    allLogs = [...allLogs, ...newLogs];
+    
+    if (snap.docs.length < LOGS_PAGE_SIZE) {
+      hasMoreLogs = false;
+      btn.style.display = 'none';
+    } else {
+      btn.textContent = 'Carregar mais logs';
+      btn.style.display = 'inline-block';
+    }
+    
+    renderLogs();
+  } catch(e) {
+    console.error('Error loading logs:', e);
+    btn.textContent = 'Erro ao carregar';
   }
 };
-
-function renderStorageMetric() {
-  const el = document.getElementById('storageMetric');
-  if (!el) return;
-  const { bytes, files } = storageStats;
-  const pct = Math.min((bytes / STORAGE_LIMIT) * 100, 100).toFixed(2);
-  const remaining = STORAGE_LIMIT - bytes;
-  const isWarn = pct > 70;
-  const isCritical = pct > 85;
-  const barColor = isCritical ? '#f87171' : isWarn ? '#fbbf24' : 'var(--amber)';
-
-  const limitLabel = '5 GB (limite de referência do Storage)';
-
-  el.innerHTML = `
-    <div class="detail-section">
-      <div class="detail-title">☁️ Uso estimado da galeria no Storage</div>
-      <div class="metric-row">
-        <div class="metric-card">
-          <div class="metric-label">Espaço estimado utilizado</div>
-          <div class="metric-value ${isCritical ? '' : isWarn ? '' : 'gold'}" style="${isCritical?'color:#f87171':isWarn?'color:#fbbf24':''}">${formatBytes(bytes)}</div>
-          <div class="metric-bar"><div class="metric-bar-fill" style="width:${pct}%;background:linear-gradient(90deg,${barColor},${barColor}dd)"></div></div>
-          <div style="font-size:.68rem;color:var(--smoke);margin-top:.4rem">${pct}% de ${limitLabel} · Restam ${formatBytes(remaining)}</div>
-          <div style="font-size:.66rem;color:var(--smoke);margin-top:.35rem">Baseado nas fotos listadas na galeria. Este painel não mede o uso exato do Firestore.</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-label">Arquivos na galeria</div>
-          <div class="metric-value gold">${files}</div>
-          <div style="font-size:.68rem;color:var(--smoke);margin-top:.4rem">Média: ${files ? formatBytes(bytes / files) : '—'} por foto</div>
-        </div>
-        ${isWarn ? `<div class="metric-card" style="border-color:rgba(250,180,10,.3)">
-          <div class="metric-label">${isCritical ? '⚠️ Limite crítico!' : '⚠️ Atenção'}</div>
-          <div style="font-size:.82rem;color:${isCritical?'#f87171':'#fbbf24'};margin-top:.3rem">
-            ${isCritical
-              ? `Muito perto do limite! Remova fotos antigas ou limpe a galeria.`
-              : `Acima de 70%, fique atento ao consumo de storage.`}
-          </div>
-        </div>` : `<div class="metric-card">
-          <div class="metric-label">Status</div>
-          <div style="font-size:1rem;color:#6ee7b7;margin-top:.3rem">✓ Dentro do limite</div>
-        </div>`}
-      </div>
-    </div>`;
-}
-
-window.setFilterById = id => {
-  activeFilter = id;
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  const btns = document.querySelectorAll('.filter-btn');
-  btns.forEach(b => { if(b.getAttribute('onclick')?.includes(`'${id}'`)) b.classList.add('active'); });
-  renderTable();
-};
-
-function getSortScore(log) {
-  if (sortField === 'action') return log.action || '';
-  if (sortField === 'detail') return getLogDetail(log);
-  if (sortField === 'who') return getLogWho(log);
-  return log.createdAt?.toMillis?.() || log.ts?.toMillis?.() || log.ts || 0;
-}
-
-function getLogDetail(log) {
-  const waParts = [];
-  if (log.whatsAppStatus === 'sent') waParts.push('Zap: enviado');
-  else if (log.whatsAppStatus === 'failed') waParts.push(`Zap: falhou${log.whatsAppDetail ? ` (${log.whatsAppDetail})` : ''}`);
-
-  if (log.detail) return [log.detail, ...waParts].join(' · ');
-  if (log.category === 'sugestoes') {
-    const parts = [];
-    if (log.song || log.artist) parts.push(`${log.song || '?'}${log.artist ? ` — ${log.artist}` : ''}`);
-    if (log.likes !== undefined || log.dislikes !== undefined) parts.push(`${log.likes || 0}👍 ${log.dislikes || 0}👎`);
-    if (log.reason) parts.push(`Motivo: ${log.reason}`);
-    if (log.by) parts.push(`Sugerida por ${log.by}`);
-    return [...parts, ...waParts].join(' · ') || '—';
-  }
-  return waParts.join(' · ') || '—';
-}
-
-function getLogWho(log) {
-  return log.who || log.removedBy || log.by || '?';
-}
-
-function getLogWhen(log) {
-  if (log.tsLocal) return log.tsLocal;
-  const ts = log.ts?.toDate?.() || log.createdAt?.toDate?.() || null;
-  return ts ? ts.toLocaleString('pt-BR') : '—';
-}
-
-function getLogDateKey(log) {
-  const ts = log.ts?.toDate?.() || log.createdAt?.toDate?.() || null;
-  if (!ts) return '';
-  return getBrazilDateKey(ts);
-}
-
-window.sortBy = field => {
-  if (sortField === field) { sortDir *= -1; }
-  else { sortField = field; sortDir = field === 'ts' ? -1 : 1; }
-  renderTable();
-  updateSortArrows();
-};
-
-function updateSortArrows() {
-  const arrows = { 1: '&#9650;', '-1': '&#9660;' };
-  document.querySelectorAll('.sort-header').forEach(th => {
-    const f = th.dataset.sort;
-    const active = f === sortField;
-    th.classList.toggle('sort-active', active);
-    th.querySelector('.sort-arrow').innerHTML = active ? arrows[sortDir] : '';
-  });
-}
-
-function renderTable() {
-  const body  = document.getElementById('logBody');
-  const empty = document.getElementById('emptyState');
-  const count = document.getElementById('filterCount');
-  const loadInfo = document.getElementById('logsLoadedInfo');
-  const loadBtn  = document.getElementById('loadMoreLogsBtn');
-
-  const filtered = allLogs.filter(l => {
-    const matchCat    = activeFilter === 'all' || l.category === activeFilter;
-    const detailText  = getLogDetail(l).toLowerCase();
-    const whoText     = getLogWho(l).toLowerCase();
-    const matchSearch = !activeSearch ||
-      l.action?.toLowerCase().includes(activeSearch) ||
-      detailText.includes(activeSearch) ||
-      whoText.includes(activeSearch);
-    return matchCat && matchSearch;
-  });
-
-  // Sort
-  filtered.sort((a, b) => {
-    const va = getSortScore(a), vb = getSortScore(b);
-    if (typeof va === 'number') return (va - vb) * sortDir;
-    return String(va).localeCompare(String(vb), 'pt-BR') * sortDir;
-  });
-
-  count.textContent = `${filtered.length} registro${filtered.length!==1?'s':''}`;
-  if (loadInfo) {
-    loadInfo.textContent = `Carregados ${allLogs.length} logs${hasMoreLogs ? ' até agora' : ' no total'}`;
-  }
-  if (loadBtn) {
-    loadBtn.style.display = hasMoreLogs ? 'inline-flex' : 'none';
-  }
-
-  if (!filtered.length) {
-    body.innerHTML = '';
-    empty.style.display = 'block';
-    return;
-  }
-
-  empty.style.display = 'none';
-  body.innerHTML = filtered.map(l => {
-    const cat   = l.category || 'geral';
-    const badge = `<span class="cat-badge cat-${cat}">${CAT_LABELS[cat]||cat}</span>`;
-    return `<tr>
-      <td>${badge}<div class="log-action" style="margin-top:.3rem">${l.action||'—'}</div></td>
-      <td><div class="log-detail">${getLogDetail(l)}</div></td>
-      <td><span class="log-who">${getLogWho(l)}</span>${l.whoEmail ? `<div style="font-size:.68rem;color:var(--smoke)">${l.whoEmail}</div>` : ''}</td>
-      <td><span class="log-ts">${getLogWhen(l)}</span></td>
-    </tr>`;
-  }).join('');
-}
 
 window.setFilter = (cat, btn) => {
-  activeFilter = cat;
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderTable();
+  if (btn) btn.classList.add('active');
+  activeFilter = cat;
+  renderLogs();
 };
 
-window.applySearch = val => {
+window.applySearch = (val) => {
   activeSearch = val.toLowerCase().trim();
-  renderTable();
+  renderLogs();
 };
 
-window.showToast = msg => {
-  const el = document.getElementById('toast');
-  el.textContent = msg; el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 3000);
-};
+function renderLogs() {
+  const tbody = document.getElementById('logBody');
+  const term = activeSearch;
+  
+  const filtered = allLogs.filter(log => {
+    if (activeFilter !== 'all' && log.category !== activeFilter) return false;
+    if (term) {
+      const text = `${log.action || ''} ${log.detail || ''} ${log.who || ''}`.toLowerCase();
+      if (!text.includes(term)) return false;
+    }
+    return true;
+  });
+  
+  if (!filtered.length) {
+    tbody.innerHTML = '';
+    document.getElementById('emptyState').style.display = 'block';
+  } else {
+    document.getElementById('emptyState').style.display = 'none';
+    tbody.innerHTML = filtered.map(log => {
+      const dateStr = log.tsDate.toLocaleString('pt-BR');
+      const catClass = log.category ? \`cat-\${log.category}\` : 'cat-forum';
+      const catLabel = CAT_LABELS[log.category] || log.category || 'Sistema';
+      
+      return \`
+        <tr>
+          <td>
+            <div><span class="cat-badge \${catClass}">\${catLabel}</span></div>
+            <div class="log-action" style="margin-top:.4rem">\${log.action || 'Ação'}</div>
+          </td>
+          <td><div class="log-detail">\${log.detail || '-'}</div></td>
+          <td><div class="log-who">\${log.who || 'Membro'}</div></td>
+          <td><div class="log-ts">\${dateStr}</div></td>
+        </tr>
+      \`;
+    }).join('');
+  }
+  
+  document.getElementById('filterCount').textContent = \`\${filtered.length} log(s) listado(s)\`;
+  document.getElementById('logsLoadedInfo').textContent = \`\${allLogs.length} carregados na memória.\`;
+}
 </script>
 </body>
 </html>
-
-
-
-
-

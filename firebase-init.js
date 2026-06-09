@@ -34,3 +34,20 @@ export {
   GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged,
   storageRef, uploadBytesResumable, getDownloadURL, deleteObject
 };
+
+export async function logAction(category, action, detail) {
+  if (!auth.currentUser) return;
+  try {
+    const who = auth.currentUser.displayName || auth.currentUser.email || 'Membro';
+    await addDoc(collection(db, 'logs'), {
+      category,
+      action,
+      detail,
+      who,
+      email: auth.currentUser.email,
+      ts: serverTimestamp()
+    });
+  } catch (e) {
+    console.error('Failed to log action:', e);
+  }
+}

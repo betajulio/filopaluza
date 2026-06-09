@@ -289,6 +289,7 @@ window.addAccess = async () => {
     await setDoc(doc(db, 'approved_emails', email), { addedAt: serverTimestamp() });
     emailInp.value = '';
     showToast('✓ E-mail autorizado!');
+    await logAction('acesso', 'E-mail Autorizado', `E-mail ${email} recebeu permissão de edição`);
     await loadAccessList();
   } catch(e) {
     console.error(e);
@@ -301,6 +302,7 @@ window.removeAccess = async (email) => {
   try {
     await deleteDoc(doc(db, 'approved_emails', email));
     showToast('✓ Acesso removido!');
+    await logAction('acesso', 'Acesso Revogado', `E-mail ${email} foi removido dos acessos`);
     await loadAccessList();
   } catch(e) {
     console.error(e);
@@ -580,6 +582,7 @@ window.saveMember = async () => {
   try {
     if (editingMemberId) {
       await updateDoc(doc(db,'members',editingMemberId), payload);
+      await logAction('membros', 'Membro Atualizado', `Perfil de ${name} foi atualizado`);
       showToast('✓ Perfil atualizado!');
     } else {
       payload.joinedAt = serverTimestamp();
@@ -596,7 +599,10 @@ window.saveMember = async () => {
 
 window.removeMember = async (id) => {
   if (!confirmAction('Remover este membro?')) return;
+  const mem = membersCache.find(e => e.id === id);
+  const mName = mem?.data?.name || 'Desconhecido';
   await deleteDoc(doc(db,'members',id));
+  await logAction('membros', 'Membro Removido', `${mName} foi removido da banda`);
   await loadMembers();
   showToast('Membro removido.');
 };
