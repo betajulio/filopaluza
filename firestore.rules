@@ -22,7 +22,7 @@ service cloud.firestore {
     match /approved_emails/{emailId} {
       allow get: if isOwnApprovedEmailDoc(emailId) || isMember();
       allow list: if isMember();
-      allow create, update, delete: if false;
+      allow create, update, delete: if isMember();
     }
 
     match /members/{memberId} {
