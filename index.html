@@ -117,6 +117,7 @@
       <p>A galera do Filópaluza</p>
     </div>
     <div class="section-line"></div>
+    <button class="btn-ghost btn-sm member-admin-only" onclick="openAccessModal()">🔑 Acessos</button>
     <button class="btn-ghost btn-sm member-admin-only" onclick="openAddMember()">+ Membro</button>
   </div>
 
@@ -189,6 +190,24 @@
   </div>
 </div>
 
+<!-- ACCESS MODAL -->
+<div class="modal-overlay" id="accessModal" onclick="if(event.target===this) closeAccessModal()">
+  <div class="modal">
+    <button class="modal-close" onclick="closeAccessModal()">✕</button>
+    <div class="modal-title">E-mails Autorizados</div>
+    <div class="modal-subtitle">Quem pode editar o site e logar</div>
+    
+    <div style="display:flex;gap:.5rem;margin-bottom:1.5rem">
+      <input type="email" id="newEmail" placeholder="email@gmail.com" style="flex:1;background:rgba(13,8,5,.8);border:1px solid rgba(200,112,26,.25);color:var(--cream);padding:.7rem .9rem;font-family:'Nunito',sans-serif;font-size:.9rem;border-radius:2px;outline:none">
+      <button class="btn btn-sm" onclick="addAccess()">Autorizar</button>
+    </div>
+    
+    <div id="accessList" style="display:flex;flex-direction:column;gap:.5rem">
+      <p style="color:var(--smoke);font-style:italic">Carregando...</p>
+    </div>
+  </div>
+</div>
+
 <!-- PHOTO CROP -->
 <div class="photo-crop-overlay" id="photoCropOverlay" style="display:none">
   <div class="photo-crop-box">
@@ -232,6 +251,62 @@ let cropResolve = null;
 const INSTRUMENTS = ['Guitarra','Violão','Baixo','Bateria','Teclado','Sanfona','Voz','Percussão'];
 const PROMOTIONS_BASE_URL = 'https://us-central1-SEU-PROJETO-ID.cloudfunctions.net';
 const promotionStateRef = doc(db, 'promotion_state', 'current');
+
+// ─── ACCESS MANAGEMENT ──────────────────────────────
+window.openAccessModal = async () => {
+  if (!isMember) return;
+  document.getElementById('accessModal').classList.add('show');
+  await loadAccessList();
+};
+window.closeAccessModal = () => document.getElementById('accessModal').classList.remove('show');
+
+async function loadAccessList() {
+  const list = document.getElementById('accessList');
+  list.innerHTML = '<p style="color:var(--smoke);font-style:italic">Carregando...</p>';
+  try {
+    const snap = await getDocs(collection(db, 'approved_emails'));
+    if (snap.empty) {
+      list.innerHTML = '<p style="color:var(--smoke);font-style:italic">Nenhum e-mail autorizado (apenas admins do Firestore).</p>';
+      return;
+    }
+    list.innerHTML = snap.docs.map(d => `
+      <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(13,8,5,.5);padding:.5rem .8rem;border:1px solid rgba(200,112,26,.15);border-radius:2px">
+        <span style="font-size:.85rem;color:var(--cream)">${d.id}</span>
+        <button class="remove-btn" style="position:static" onclick="removeAccess('${d.id}')">✕</button>
+      </div>
+    `).join('');
+  } catch(e) {
+    console.error(e);
+    list.innerHTML = '<p style="color:#e06060;font-size:.8rem">Erro ao carregar e-mails.</p>';
+  }
+}
+
+window.addAccess = async () => {
+  const emailInp = document.getElementById('newEmail');
+  const email = emailInp.value.trim().toLowerCase();
+  if (!email || !email.includes('@')) return showToast('⚠ E-mail inválido');
+  try {
+    await setDoc(doc(db, 'approved_emails', email), { addedAt: serverTimestamp() });
+    emailInp.value = '';
+    showToast('✓ E-mail autorizado!');
+    await loadAccessList();
+  } catch(e) {
+    console.error(e);
+    showToast('⚠ Erro ao autorizar e-mail');
+  }
+};
+
+window.removeAccess = async (email) => {
+  if (!confirmAction(`Remover acesso de ${email}?`)) return;
+  try {
+    await deleteDoc(doc(db, 'approved_emails', email));
+    showToast('✓ Acesso removido!');
+    await loadAccessList();
+  } catch(e) {
+    console.error(e);
+    showToast('⚠ Erro ao remover e-mail');
+  }
+};
 
 // ─── TOAST ───────────────────────────────────────
 function showToast(msg) {
