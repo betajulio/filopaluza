@@ -328,8 +328,18 @@ function renderMembers() {
     const avatar = m.photoURL
       ? `<img src="${m.photoURL}" alt="${m.name}" loading="lazy">`
       : initials;
+    const instrumentIcons = {
+      'Voz': '🎤',
+      'Violão': '🎸',
+      'Guitarra': '🎸',
+      'Baixo': '🎸',
+      'Bateria': '🥁',
+      'Teclado': '🎹',
+      'Percussão': '🪘',
+      'Sanfona': '🪗'
+    };
     const instruments = (m.instruments || []).map(i =>
-      `<span class="instrument-tag">${i}</span>`
+      `<span class="instrument-tag">${instrumentIcons[i] || '🎵'} ${i}</span>`
     ).join('');
 
     let recsHtml = '';
@@ -605,7 +615,8 @@ window.confirmCrop = async () => {
     if (!user) { showToast('⚠ Faça login primeiro'); return; }
 
     showToast('⏳ Enviando ao servidor...');
-    const fRef = storageRef(storage, `members/${user.uid}/avatar.jpg`);
+    const memberId = window.editingMemberId || `new_${Date.now()}`;
+    const fRef = storageRef(storage, `members/${memberId}/avatar_${Date.now()}.jpg`);
     await uploadBytesResumable(fRef, blob, { contentType: 'image/jpeg' });
     const url = await getDownloadURL(fRef);
     
