@@ -196,10 +196,10 @@
     <div class="photo-crop-stage" id="photoCropStage">
       <canvas id="photoCropCanvas"></canvas>
     </div>
-    <input type="range" class="photo-crop-zoom" id="photoCropZoom" min="1" max="4" step="0.01" value="1">
+    <input type="range" class="photo-crop-zoom" id="photoCropZoom" min="0.2" max="5" step="0.01" value="1">
     <div class="photo-crop-actions">
       <button class="btn-ghost btn-sm" onclick="cancelCrop()">Cancelar</button>
-      <button class="btn btn-sm" onclick="confirmCrop()">✓ Usar esta foto</button>
+      <button class="btn btn-sm" onclick="alert('0. Click registrado na tela!'); confirmCrop()">✓ Usar esta foto</button>
     </div>
   </div>
 </div>
@@ -517,75 +517,111 @@ window.removeMember = async (id) => {
 function openCrop(dataUrl) {
   const overlay = document.getElementById('photoCropOverlay');
   overlay.style.display = 'flex';
+
   cropCanvas = document.getElementById('photoCropCanvas');
-  cropCtx = cropCanvas.getContext('2d');
-  cropImg = new Image();
+  cropCtx    = cropCanvas.getContext('2d');
+
   cropZoom = 1; cropX = 0; cropY = 0;
   document.getElementById('photoCropZoom').value = 1;
+
+  cropImg = new Image();
   cropImg.onload = () => {
-    cropCanvas.width = cropCanvas.offsetWidth;
-    cropCanvas.height = cropCanvas.offsetHeight;
-    // Scale so the image covers the canvas at zoom=1
-    const scaleX = cropCanvas.width / cropImg.width;
-    const scaleY = cropCanvas.height / cropImg.height;
-    cropBaseScale = Math.max(scaleX, scaleY);
+    // Measure the stage AFTER overlay is visible to get real rendered size
+    const stage2 = document.getElementById('photoCropStage');
+    const sz = stage2.offsetWidth || 320;
+    cropCanvas.width  = sz;
+    cropCanvas.height = sz;
+    // Scale so the image FITS the canvas at zoom=1
+    const scaleX = sz / cropImg.naturalWidth;
+    const scaleY = sz / cropImg.naturalHeight;
+    cropBaseScale = Math.min(scaleX, scaleY);
     drawCrop();
+  };
+  cropImg.onerror = () => {
+    showToast('⚠ Formato de imagem não suportado ou corrompido. Tente outra foto.');
+    cancelCrop();
   };
   cropImg.src = dataUrl;
 
   const stage = document.getElementById('photoCropStage');
-  stage.onpointerdown = e => { cropDragging=true; cropLastX=e.clientX; cropLastY=e.clientY; stage.setPointerCapture(e.pointerId); };
-  stage.onpointermove = e => { if(!cropDragging) return; cropX+=e.clientX-cropLastX; cropY+=e.clientY-cropLastY; cropLastX=e.clientX; cropLastY=e.clientY; drawCrop(); };
-  stage.onpointerup = () => cropDragging=false;
-  document.getElementById('photoCropZoom').oninput = e => { cropZoom=parseFloat(e.target.value); drawCrop(); };
+
+  stage.onpointerdown = e => {
+    cropDragging = true;
+    cropLastX = e.clientX; cropLastY = e.clientY;
+    stage.setPointerCapture(e.pointerId);
+  };
+  stage.onpointermove = e => {
+    if (!cropDragging) return;
+    cropX += e.clientX - cropLastX; cropY += e.clientY - cropLastY;
+    cropLastX = e.clientX; cropLastY = e.clientY;
+    drawCrop();
+  };
+  stage.onpointerup   = () => cropDragging = false;
+  stage.onpointercancel = () => cropDragging = false;
+
+  document.getElementById('photoCropZoom').oninput = e => {
+    cropZoom = parseFloat(e.target.value);
+    drawCrop();
+  };
 }
 
 function drawCrop() {
-  if (!cropCtx || !cropImg) return;
+  if (!cropCtx || !cropImg || !cropImg.complete) return;
   const W = cropCanvas.width, H = cropCanvas.height;
-  cropCtx.clearRect(0,0,W,H);
-  const iw = cropImg.width * cropBaseScale * cropZoom;
-  const ih = cropImg.height * cropBaseScale * cropZoom;
+  cropCtx.clearRect(0, 0, W, H);
+  const iw = cropImg.naturalWidth  * cropBaseScale * cropZoom;
+  const ih = cropImg.naturalHeight * cropBaseScale * cropZoom;
   cropCtx.drawImage(cropImg, W/2 - iw/2 + cropX, H/2 - ih/2 + cropY, iw, ih);
 }
 
-window.cancelCrop = () => { document.getElementById('photoCropOverlay').style.display='none'; };
+window.cancelCrop = () => {
+  document.getElementById('photoCropOverlay').style.display = 'none';
+};
 
 window.confirmCrop = async () => {
-  const SIZE = 320;
-  const offscreen = document.createElement('canvas');
-  offscreen.width = offscreen.height = SIZE;
-  const ctx = offscreen.getContext('2d');
-  const scale = SIZE / cropCanvas.offsetWidth;
-  const iw = cropImg.width * cropBaseScale * cropZoom * scale;
-  const ih = cropImg.height * cropBaseScale * cropZoom * scale;
-  ctx.drawImage(cropImg, SIZE/2 - iw/2 + cropX*scale, SIZE/2 - ih/2 + cropY*scale, iw, ih);
+  try {
+    alert('1. Função confirmCrop iniciou!');
+    showToast('⏳ Processando imagem...');
+    
+    const SIZE = 320;
+    const offscreen = document.createElement('canvas');
+    offscreen.width = offscreen.height = SIZE;
+    const ctx = offscreen.getContext('2d');
 
-  offscreen.toBlob(async blob => {
+    // Scale from actual canvas size to output size
+    const canvSz = cropCanvas.width || 320;
+    const ratio  = SIZE / canvSz;
+    const iw = cropImg.naturalWidth  * cropBaseScale * cropZoom * ratio;
+    const ih = cropImg.naturalHeight * cropBaseScale * cropZoom * ratio;
+    ctx.drawImage(cropImg, SIZE/2 - iw/2 + cropX*ratio, SIZE/2 - ih/2 + cropY*ratio, iw, ih);
+
+    // Bulletproof method to get blob (avoids iOS Safari toBlob silent hang bug)
+    const dataUrl = offscreen.toDataURL('image/jpeg', 0.88);
+    const res = await fetch(dataUrl);
+    const blob = await res.blob();
+
+    if (!blob) { showToast('⚠ Erro ao gerar o arquivo da imagem'); return; }
+    
     const user = auth.currentUser;
     if (!user) { showToast('⚠ Faça login primeiro'); return; }
-    const path = `members/${user.uid}/avatar.jpg`;
-    const ref = storageRef(null, path);
-    // Use storage directly
-    try {
-      const { getStorage, ref: sRef, uploadBytes, getDownloadURL: gDU } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js');
-      // We'll use our imported storage directly
-    } catch {}
 
-    // Direct upload using Firebase Storage
-    const { storage: st } = await import('./firebase-init.js').then(m => ({ storage: m.storage })).catch(() => ({}));
-
-    showToast('⏳ Enviando foto...');
-    const fRef = storageRef(st, `members/${user.uid}/avatar.jpg`);
-    const uploadTask = uploadBytesResumable(fRef, blob, { contentType:'image/jpeg' });
-    uploadTask.on('state_changed', null, err => showToast('⚠ Erro no upload'), async () => {
-      const url = await getDownloadURL(uploadTask.snapshot.ref);
-      const prev = document.getElementById('avatarPreview');
-      if (prev) { prev.src = url; prev.style.display='block'; }
-      document.getElementById('photoCropOverlay').style.display='none';
-      showToast('✓ Foto carregada!');
-    });
-  }, 'image/jpeg', 0.88);
+    alert('2. Imagem processada, iniciando upload...');
+    showToast('⏳ Enviando ao servidor...');
+    const fRef = storageRef(storage, `members/${user.uid}/avatar.jpg`);
+    await uploadBytesResumable(fRef, blob, { contentType: 'image/jpeg' });
+    const url = await getDownloadURL(fRef);
+    
+    alert('3. Upload finalizado!');
+    const prev = document.getElementById('avatarPreview');
+    if (prev) { prev.src = url; prev.style.display = 'block'; }
+    
+    document.getElementById('photoCropOverlay').style.display = 'none';
+    showToast('✓ Foto carregada com sucesso!');
+  } catch (e) {
+    alert('ERRO CATCH: ' + e.message);
+    console.error('confirmCrop error:', e);
+    showToast('⚠ Erro: ' + (e.message || 'Desconhecido'));
+  }
 };
 
 // ─── PROMOTION COUNTDOWN ──────────────────────────
