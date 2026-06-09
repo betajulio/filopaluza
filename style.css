@@ -159,7 +159,7 @@ nav {
 
 /* ── HERO ────────────────────────────────────────── */
 #hero {
-  height:100vh; display:flex; flex-direction:column;
+  min-height:100vh; display:flex; flex-direction:column;
   align-items:center; justify-content:center;
   position:relative; overflow:hidden; padding-top:72px;
 }
@@ -182,7 +182,7 @@ nav {
   margin:.5rem 0 .75rem; animation:fadeUp 1.2s .1s ease both;
 }
 .hero-logo-img {
-  width:550px; max-width:90vw; height:auto; object-fit:contain;
+  width:100%; max-width:550px; max-height:45vh; object-fit:contain;
   filter:drop-shadow(0 0 32px rgba(200,112,26,.45));
 }
 @keyframes fadeUp{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'filopaluza-v4';
+const CACHE_NAME = 'filopaluza-v5';
 const urlsToCache = [
   './',
   './index.html',
