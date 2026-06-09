@@ -318,25 +318,25 @@ function renderLogs() {
     document.getElementById('emptyState').style.display = 'none';
     tbody.innerHTML = filtered.map(log => {
       const dateStr = log.tsDate.toLocaleString('pt-BR');
-      const catClass = log.category ? \`cat-\${log.category}\` : 'cat-forum';
+      const catClass = log.category ? `cat-${log.category}` : 'cat-forum';
       const catLabel = CAT_LABELS[log.category] || log.category || 'Sistema';
       
-      return \`
+      return `
         <tr>
           <td>
-            <div><span class="cat-badge \${catClass}">\${catLabel}</span></div>
-            <div class="log-action" style="margin-top:.4rem">\${log.action || 'Ação'}</div>
+            <div><span class="cat-badge ${catClass}">${catLabel}</span></div>
+            <div class="log-action" style="margin-top:.4rem">${log.action || 'Ação'}</div>
           </td>
-          <td><div class="log-detail">\${log.detail || '-'}</div></td>
-          <td><div class="log-who">\${log.who || 'Membro'}</div></td>
-          <td><div class="log-ts">\${dateStr}</div></td>
+          <td><div class="log-detail">${log.detail || '-'}</div></td>
+          <td><div class="log-who">${log.who || 'Membro'}</div></td>
+          <td><div class="log-ts">${dateStr}</div></td>
         </tr>
-      \`;
+      `;
     }).join('');
   }
   
-  document.getElementById('filterCount').textContent = \`\${filtered.length} log(s) listado(s)\`;
-  document.getElementById('logsLoadedInfo').textContent = \`\${allLogs.length} carregados na memória.\`;
+  document.getElementById('filterCount').textContent = `${filtered.length} log(s) listado(s)`;
+  document.getElementById('logsLoadedInfo').textContent = `${allLogs.length} carregados na memória.`;
 }
 </script>
 </body>
