@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/fireba
 import {
   getFirestore, collection, doc,
   onSnapshot, addDoc, deleteDoc, updateDoc,
-  setDoc, getDoc, getDocs, orderBy, query, serverTimestamp, runTransaction, Timestamp, increment
+  setDoc, getDoc, getDocs, orderBy, query, serverTimestamp, runTransaction, Timestamp, increment, limit, startAfter, getCountFromServer
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import {
   getAuth, GoogleAuthProvider, signInWithPopup, signOut,
@@ -30,7 +30,7 @@ const provider = new GoogleAuthProvider();
 
 export {
   app, db, auth, storage, provider,
-  collection, doc, onSnapshot, addDoc, deleteDoc, updateDoc, setDoc, getDoc, getDocs, orderBy, query, serverTimestamp, runTransaction, Timestamp, increment,
+  collection, doc, onSnapshot, addDoc, deleteDoc, updateDoc, setDoc, getDoc, getDocs, orderBy, query, serverTimestamp, runTransaction, Timestamp, increment, limit, startAfter, getCountFromServer,
   GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged,
   storageRef, uploadBytesResumable, getDownloadURL, deleteObject
 };
